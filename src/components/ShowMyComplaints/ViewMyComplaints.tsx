@@ -38,4 +38,35 @@ function MyComplaints() {
     },
       
     ];
+
+    const userComplaints = complaints.filter(
+        (complaint) => complaint.userId === currentUserId
+    );
+
+    return(
+        <section className="my-complaints">
+      <h2>My Complaints</h2>
+
+      <p>Review the complaints you have submitted to Winnipeg Transit Care.</p>
+
+      <ul className="complaint-list">
+        {userComplaints.map((complaint) => (
+          <li key={complaint.complaintId} className="complaint-card">
+            <h3>{complaint.title}</h3>
+
+            <p>
+              <strong>Route:</strong> {complaint.route}
+            </p>
+
+            <p>{complaint.description}</p>
+
+            <p>
+              <strong>Status:</strong> {complaint.status}
+            </p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
+export default MyComplaints;
