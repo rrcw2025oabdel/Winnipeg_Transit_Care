@@ -74,3 +74,41 @@ function BusRoutes() {
         },
     ];
 
+    return (
+        <section className="bus-routes">
+            <h2>Bus Routes</h2>
+
+            <p>View Winnipeg Transit Bus Routes</p>
+
+            <ul className="route-list">
+                { routes.map((route) => (
+                    <li key={route.id} className="route-card">
+                    <h3>
+                        {route.routeNumber} - {route.routeName}
+                    </h3>
+
+                    <p>{route.description}</p>
+                    <p>
+                        <strong>Weekday:</strong> {route.schedule.weekday}
+                    </p>
+
+                    <p>
+                        <strong>Weekend:</strong> {route.schedule.weekend}
+                    </p>
+                    
+                    <p>
+                        <strong>Time:</strong> {route.schedule.time}
+                    </p>
+
+                    <p>
+                        <strong>Bus Number(optional):</strong> {route.busNumber}
+                    </p>
+
+                </li>
+                ))}
+            </ul>
+            </section>
+    );
+}
+
+export default BusRoutes;

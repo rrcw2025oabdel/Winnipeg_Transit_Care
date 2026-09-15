@@ -9,9 +9,13 @@ Primary: #003055 - Dark Blue
 Secondary: #f0a400 - Yellow/orange for highlighting/accents
 Tertiary: #e9ecef - Light grey for backgrounds
 
+Neutrals 
+#ffffff 
+#212529
+#495057
+#6c757d 
 
 
-Extended colour palette:
 
 # Colour usage rules
 - Use tokens instead hex codes for colours in CSS and design tools. Will provide a consistent colour palette across the project and make it easier to update colours in the future.
