@@ -25,9 +25,9 @@ function BusRoutes() {
             routeName: "Ellice - Airport",
             description: "Bus from the Forks to the Airport"
             stops: [
-                { id: 101, busStopNumber: 30154 },
-                { id: 102, busStopNumber: 52173 },
-                { id: 103, busStopNumber: 30154 },
+                { id: 101, busStopNumber: 30011 },
+                { id: 102, busStopNumber: 30012 },
+                { id: 103, busStopNumber: 30013 },
             ],
             schedule: {
                 weekday: "Monday",
@@ -36,3 +36,21 @@ function BusRoutes() {
             },
             busNumber: 5555, 
         },
+        { 
+            id: 2, 
+            routeNumber: "BLUE",
+            routeName: "St. Norbert",
+            description: "Blue line from Assiniboia Downs to St. Norbert",
+            stops: [
+                { id: 104, busStopNumber: 30014 },
+                { id: 105, busStopNumber: 30015 },
+                { id: 106, busStopNumber: 30016 },
+            ],
+            schedule: {
+                weekday: "NA",
+                weekend: "Saturday", 
+                time: "00:00",
+            },
+            busNumber: 6666,
+        },
+        
