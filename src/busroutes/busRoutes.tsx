@@ -12,18 +12,18 @@ interface BusRoute {
     schedule: {
         weekday: string;
         weekend: string;
-        time: string;
+        time: string; // use military time
     }
     busNumber?: number;  // Number on the side of the bus
 }
 
 function BusRoutes() {
-    const routes: BusRoute [
+    const routes: BusRoute[] = [
         {
             id: 1, 
             routeNumber: "D14",
             routeName: "Ellice - Airport",
-            description: "Bus from the Forks to the Airport"
+            description: "Bus from the Forks to the Airport",
             stops: [
                 { id: 101, busStopNumber: 30011 },
                 { id: 102, busStopNumber: 30012 },
@@ -36,6 +36,7 @@ function BusRoutes() {
             },
             busNumber: 5555, 
         },
+        
         { 
             id: 2, 
             routeNumber: "BLUE",
@@ -53,4 +54,23 @@ function BusRoutes() {
             },
             busNumber: 6666,
         },
-        
+
+        {
+            id: 3, 
+            routeNumber: "15",
+            routeName: "Saint Vital",
+            description: "Route through the Saint Vital area",
+            stops: [
+                { id: 107, busStopNumber: 30017 },
+                { id: 108, busStopNumber: 30018 },
+                { id: 109, busStopNumber: 30019 },
+            ],
+            schedule: {
+                weekday: "Friday",
+                weekend: "Sunday",
+                time: "13:15",
+            },
+            busNumber: 7777,
+        },
+    ];
+
