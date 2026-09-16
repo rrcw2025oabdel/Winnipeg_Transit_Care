@@ -21,12 +21,39 @@ interface Complaint {
 
 function CreateComplaint() {
   return (
-    <section className="create-complaint"><h2>File a Complaint</h2><form><div><label htmlFor="complaint-route">Bus Route</label><select id="complaint-route" required>            {availableRoutes.map((route) => (
-              <option key={route} value={route}>                {route}
-              </option>            ))}
-          </select></div><div><label htmlFor="complaint-title">Title</label><inputid="complaint-title"type="text"required/></div><div><label htmlFor="complaint-description">            Description
-          </label><textareaid="complaint-description"rows={5}
-            required/></div><button type="button">Submit Complaint</button></form></section>  );
+    <section className="create-complaint">
+      <h2>File a Complaint</h2>\
+      <form>
+        <div>
+          <label htmlFor="complaint-route">Bus Route</label>
+          <select 
+            id="complaint-route" required
+          > 
+            {availableRoutes.map((route) => (
+              <option key={route} value={route}>
+                {route}
+              </option>            
+            ))}
+          </select>
+        </div>
+          <div>
+            <label htmlFor="complaint-title">Title</label>
+              <input
+                id="complaint-title"type="text"required
+              />
+          </div>
+        <div>
+          <label htmlFor="complaint-description">Description</label>
+            <textarea
+              id="complaint-description"
+              rows={5}
+              required
+            />
+          </div>
+          <button type="button">Submit Complaint</button>
+      </form>
+    </section>  
+  );
 }
 
 export default CreateComplaint;
