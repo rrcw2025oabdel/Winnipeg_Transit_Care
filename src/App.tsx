@@ -1,3 +1,4 @@
+import CreateComplaint from "./components/CreateComplaint/CreateComplaint";
 import ViewMyComplaints from "./components/ViewMyComplaints/ViewMyComplaints";
 import BusRoutes from "./busroutes/busRoutes";
 import Header from "./components/header/Header";
@@ -10,6 +11,7 @@ function App() {
         <>
             <Header />
             <BusRoutes />
+            <CreateComplaint />
             <ViewMyComplaints />
             <Footer />
         </>
