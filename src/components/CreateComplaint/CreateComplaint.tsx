@@ -1,12 +1,3 @@
-interface Complaint {
-    complaintId: number;
-    userId: number;
-    route: string;
-    title: string;
-    description: string;
-    status: string;
-}
-
  const availableRoutes: string[] = [
     "BLUE - Unicity Mall / University of Manitoba",
     "FX2 - Main / St. Mary's",
