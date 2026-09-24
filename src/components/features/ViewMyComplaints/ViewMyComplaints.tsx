@@ -1,3 +1,8 @@
+type ViewMyComplaintsProps = {
+  transitMessage: string;
+  setTransitMessage: (message: string) => void;
+};
+
 interface Complaint {
   complaintId: number;
   userId: number;
@@ -7,7 +12,10 @@ interface Complaint {
   status: string;
 }
 
-function MyComplaints() {
+function MyComplaints({
+  transitMessage,
+  setTransitMessage,
+}: ViewMyComplaintsProps) {
     const currentUserId = 1;
     
     const complaints: Complaint[] =[
@@ -66,6 +74,17 @@ function MyComplaints() {
           </li>
         ))}
       </ul>
+      <p>{transitMessage}</p>
+{/*Button to update the transit message*/}
+<button
+  onClick={() =>
+    setTransitMessage(
+      "Missed the bus? That's just an unexpected feature."
+    )
+  }
+>
+  New Transit Message
+</button>
     </section>
   );
 }

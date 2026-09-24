@@ -1,3 +1,8 @@
+type BusRoutesProps = {
+  transitMessage: string;
+  setTransitMessage: (message: string) => void;
+};
+
 interface BusStop {
     id: number;
     busStopNumber: number;  // 5 digit number eg. #20172
@@ -17,7 +22,10 @@ interface BusRoute {
     busNumber?: number;  // Number on the side of the bus
 }
 
-function BusRoutes() {
+function BusRoutes({
+  transitMessage,
+  setTransitMessage,
+}: BusRoutesProps) {
     const routes: BusRoute[] = [
         {
             id: 1, 
@@ -75,6 +83,7 @@ function BusRoutes() {
     ];
 
     return (
+        
         <section className="bus-routes">
             <h2>Bus Routes</h2>
 
@@ -107,6 +116,17 @@ function BusRoutes() {
                 </li>
                 ))}
             </ul>
+            <p>{transitMessage}</p>
+{/*Button to update the transit message*/}
+<button
+  onClick={() =>
+    setTransitMessage(
+      "Next stop: Production. Please commit before exiting."
+    )
+  }
+>
+  New Transit Message
+</button>
             </section>
     );
 }
