@@ -1,3 +1,7 @@
+type CreateComplaintProps = {
+  transitMessage: string;
+  setTransitMessage: (message: string) => void;
+};
 
 const availableRoutes: string[] = [
   "BLUE - Unicity Mall / University of Manitoba",
@@ -11,7 +15,10 @@ const availableRoutes: string[] = [
   "F9 - Lagimodiere / Abinojii Mikanah",
 ];
 
-function CreateComplaint() {
+function CreateComplaint({
+  transitMessage,
+  setTransitMessage,
+}: CreateComplaintProps) {
   return (
     <section className="create-complaint">
       <h2>File a Complaint</h2>
@@ -59,8 +66,22 @@ function CreateComplaint() {
           Submit Complaint
         </button>
       </form>
+      <p>{transitMessage}</p>
+{/*Button to update the transit message*/}
+<button
+  onClick={() =>
+    setTransitMessage(
+      "Bus delayed due to a bug in production."
+    )
+  }
+>
+  New Transit Message
+</button>
     </section>
+    
   );
+  
 }
+
 
 export default CreateComplaint;
