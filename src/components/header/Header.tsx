@@ -1,8 +1,6 @@
-import styles from "./Header.module.css";
-
 function Header() {
     return (
-        <header className ={styles.header}>
+        <header>
             <h1> Winnipeg Transit Care</h1>
         </header>
             )
