@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {Routes,Route} from "react-router-dom";
 import CreateComplaint from "./components/features/CreateComplaint/CreateComplaint";
+import ComplaintList from "./components/features/ComplaintList/ComplaintList";
 import ViewMyComplaints from "./components/features/ViewMyComplaints/ViewMyComplaints";
 import BusRoutes from "./components/features/busroutes/busRoutes";
 import Layout from "./components/layout/Layout";
@@ -47,6 +48,13 @@ function App() {
               transitMessage={transitMessage}
               setTransitMessage={setTransitMessage}
             />
+          }
+        />
+        
+        <Route
+          path="/complaints/list"
+          element={
+            <ComplaintList complaints={complaints} setComplaints={setComplaints} />
           }
         />
 
