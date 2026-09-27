@@ -1,4 +1,5 @@
 import {useState} from "react";
+import "./ViewMyComplaints.module.css";
 
 type ViewMyComplaintsProps = {
   transitMessage: string;
