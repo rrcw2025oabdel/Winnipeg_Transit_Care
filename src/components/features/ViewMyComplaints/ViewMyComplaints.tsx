@@ -95,7 +95,17 @@ function archiveComplaint(complaintId: number) {
   (complaint) =>
     !archivedIds.includes(complaint.complaintId) &&
     (statusFilter === "All" || complaint.status === statusFilter)
+
 );
+    const archivedComplaints = userComplaints.filter((complaint) =>
+      archivedIds.includes(complaint.complaintId)
+);
+
+function restoreComplaint(complaintId: number) {
+  setArchivedIds((currentIds) =>
+    currentIds.filter((id) => id !== complaintId)
+  );
+}
    
     return(
     
@@ -131,6 +141,30 @@ function archiveComplaint(complaintId: number) {
           </li>
         ))}
       </ul>
+      {filteredComplaints.length === 0 && (
+  <p>No complaints match the selected status.</p>
+)}
+
+<h3>Archived complaints</h3>
+
+{archivedComplaints.length === 0 ? (
+  <p>No archived complaints.</p>
+) : (
+  <ul>
+    {archivedComplaints.map((complaint) => (
+      <li key={complaint.complaintId}>
+        {complaint.title}{" "}
+        <button
+          type="button"
+          onClick={() => restoreComplaint(complaint.complaintId)}
+        >
+          Restore
+        </button>
+      </li>
+    ))}
+  </ul>
+)}
+   <div className="transit-message-box">
       <p>{transitMessage}</p>
 {/*Button to update the transit message*/}
 <button
@@ -141,7 +175,7 @@ function archiveComplaint(complaintId: number) {
   }
 >
   New Transit Message
-</button>
+</button> </div>
     </section>
   );
 }

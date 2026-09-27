@@ -201,3 +201,10 @@ footer li {
 .create-complaint button:hover {
   background-color: #005080;
 }
+
+.transit-message-box {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 2px solid #e9ecef;
+  background-color: #f8f9fa;
+}
