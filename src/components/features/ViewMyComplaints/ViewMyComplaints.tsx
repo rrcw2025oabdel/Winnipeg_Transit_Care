@@ -1,3 +1,5 @@
+import {useState} from "react";
+
 type ViewMyComplaintsProps = {
   transitMessage: string;
   setTransitMessage: (message: string) => void;
@@ -18,8 +20,9 @@ function MyComplaints({
 }: ViewMyComplaintsProps) {
     const currentUserId = 1;
     
-    const complaints: Complaint[] =[
-      {
+    const [complaints] = useState<Complaint[]>(
+      [
+    {
       complaintId: 1,
       userId: 1,
       route: "Route 5 - Portage",
@@ -38,6 +41,15 @@ function MyComplaints({
     },
     {
       complaintId: 3,
+      userId: 1,
+      route: "Route 16 - Saint boniface",
+      title: "Bus did not stop",
+      description:
+        "The bus passed the stop even though passengers were waiting and did not stop.",
+      status: "Resolved",
+    },
+    {
+      complaintId: 4,
       userId: 2,
       route: "Route 10 - North Main",
       title: "Overcrowded bus",
@@ -45,7 +57,7 @@ function MyComplaints({
       status: "Resolved",
     },
       
-    ];
+    ]);
 
     const userComplaints = complaints.filter(
         (complaint) => complaint.userId === currentUserId
