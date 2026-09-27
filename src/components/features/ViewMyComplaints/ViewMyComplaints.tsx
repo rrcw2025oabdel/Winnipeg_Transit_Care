@@ -43,6 +43,11 @@ function MyComplaints({
 }: ViewMyComplaintsProps) {
     const currentUserId = 1;
     const [statusFilter, setStatusFilter] = useState("All");
+    const [archivedIds, setArchivedIds] = useState<number[]>([]);
+
+function archiveComplaint(complaintId: number) {
+  setArchivedIds((currentIds) => [...currentIds, complaintId]);
+}
     
     const [complaints] = useState<Complaint[]>(
       [
@@ -74,7 +79,7 @@ function MyComplaints({
     },
     {
       complaintId: 4,
-      userId: 2,
+      userId: 1,
       route: "Route 10 - North Main",
       title: "Overcrowded bus",
       description: "The bus was too crowded to allow more passengers.",
@@ -88,7 +93,8 @@ function MyComplaints({
     );
     const filteredComplaints = userComplaints.filter(
   (complaint) =>
-    statusFilter === "All" || complaint.status === statusFilter
+    !archivedIds.includes(complaint.complaintId) &&
+    (statusFilter === "All" || complaint.status === statusFilter)
 );
    
     return(
@@ -105,6 +111,12 @@ function MyComplaints({
       <ul className="complaint-list">
         {filteredComplaints.map((complaint) => (
           <li key={complaint.complaintId} className="complaint-card">
+<button
+  type="button"
+  onClick={() => archiveComplaint(complaint.complaintId)}
+>
+  Archive
+</button>
             <h3>{complaint.title}</h3>
 
             <p>
