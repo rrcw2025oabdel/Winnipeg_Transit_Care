@@ -32,6 +32,9 @@ function CreateComplaint({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [error, setError] = useState("");
+  const [latestComplaint, setLatestComplaint] = useState<Complaint | null>(
+    null
+  );
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,10 +58,19 @@ function CreateComplaint({
     };
 
     setComplaints([...complaints, newComplaint]);
+    setLatestComplaint(newComplaint);
 
     setTitle("");
     setDescription("");
     setRoute(availableRoutes[0]);
+  }
+
+  function handleCancel() {
+    if (!latestComplaint) return;
+    setComplaints(
+      complaints.filter((c) => c.complaintId !== latestComplaint.complaintId)
+    );
+    setLatestComplaint(null);
   }
 
   return (
@@ -105,9 +117,37 @@ function CreateComplaint({
             required
           />
         </div>
-
         <button type="submit">Submit Complaint</button>
       </form>
+
+      <div className="complaint-preview">
+        <h3>Preview</h3>
+        <p>
+          <strong>Route:</strong> {route}
+        </p>
+        <p>
+          <strong>Title:</strong> {title || "(untitled)"}
+        </p>
+        <p>
+          <strong>Description:</strong> {description || "(no description yet)"}
+        </p>
+      </div>
+
+      {latestComplaint && (
+        <div className="latest-complaint">
+          <h3>Latest Complaint Filed</h3>
+          <p>
+            <strong>{latestComplaint.title}</strong> — {latestComplaint.route}
+          </p>
+          <p>{latestComplaint.description}</p>
+          <p>
+            <strong>Status:</strong> {latestComplaint.status}
+          </p>
+          <button type="button" onClick={handleCancel}>
+            Cancel Complaint
+          </button>
+        </div>
+      )}
 
       <p>{transitMessage}</p>
 
