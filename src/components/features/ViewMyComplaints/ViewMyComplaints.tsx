@@ -5,6 +5,11 @@ type ViewMyComplaintsProps = {
   setTransitMessage: (message: string) => void;
 };
 
+type statusFilterProps = {
+  statusFilter: string;
+  setStatusFilter: (status: string) => void;
+};
+
 interface Complaint {
   complaintId: number;
   userId: number;
@@ -14,11 +19,30 @@ interface Complaint {
   status: string;
 }
 
+function StatusFilter({
+  statusFilter, setStatusFilter,
+}: statusFilterProps) {
+  return (
+    <label>
+      Filter by status:{" "}
+      <select
+        value={statusFilter}
+        onChange={(event) => setStatusFilter(event.target.value)}
+      >
+        <option value="All">All</option>
+        <option value="Submitted">Submitted</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Resolved">Resolved</option>
+      </select>
+    </label>
+  );
+}
 function MyComplaints({
   transitMessage,
   setTransitMessage,
 }: ViewMyComplaintsProps) {
     const currentUserId = 1;
+    const [statusFilter, setStatusFilter] = useState("All");
     
     const [complaints] = useState<Complaint[]>(
       [
@@ -62,15 +86,24 @@ function MyComplaints({
     const userComplaints = complaints.filter(
         (complaint) => complaint.userId === currentUserId
     );
-
+    const filteredComplaints = userComplaints.filter(
+  (complaint) =>
+    statusFilter === "All" || complaint.status === statusFilter
+);
+   
     return(
+    
         <section className="my-complaints">
+      <StatusFilter
+      statusFilter={statusFilter}
+      setStatusFilter={setStatusFilter}
+/>
       <h2>My Complaints</h2>
 
       <p>Review the complaints you have submitted to Winnipeg Transit Care.</p>
 
       <ul className="complaint-list">
-        {userComplaints.map((complaint) => (
+        {filteredComplaints.map((complaint) => (
           <li key={complaint.complaintId} className="complaint-card">
             <h3>{complaint.title}</h3>
 
