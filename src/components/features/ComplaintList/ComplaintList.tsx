@@ -1,0 +1,1 @@
+import type { Complaint } from "../../../types/complaint";
