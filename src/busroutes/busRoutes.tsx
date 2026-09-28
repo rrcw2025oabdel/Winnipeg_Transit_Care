@@ -113,7 +113,10 @@ function BusRoutes() {
 
 
             <ul className="route-list">
-                { routes.map((route) => (
+                {filteredRoutes.length === 0 ? (
+                    <li>No routes found for this neighbourhood</li>
+                ) : (  
+                    filteredRoutes.map((route) => (
                     <li key={route.id} className="route-card">
                         <h3>
                             {route.routeNumber} - {route.routeName}
@@ -141,11 +144,9 @@ function BusRoutes() {
                         </p>
 
                 </li>
-                ))}
+                ))
+                )}
             </ul>
-            {filteredRoutes.length === 0 && (
-                <p>No routes found for the selected neighbourhoods.</p>    
-            )}
                 </section>
     );
 }
