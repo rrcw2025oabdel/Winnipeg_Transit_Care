@@ -81,6 +81,13 @@ function BusRoutes() {
     ];
 
     const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
+    const [favourites, setFavourites] = useState<number[]>([]);
+    
+    const toggleFavourite = (id: number) => {
+        setFavourites((prev) =>
+            prev.includes(id) ? prev.filter((favID) => favID !== id) : [...prev, id]
+        );
+    };
 
     const neighbourhoods = ["All", ...Array.from(new Set(routes.map((r) => r.neighbourhood)))];
 
@@ -88,6 +95,12 @@ function BusRoutes() {
         selectedNeighbourhood === "All"
         ? routes
         : routes.filter((route) => route.neighbourhood === selectedNeighbourhood);
+
+    const sortedRoutes = [...filteredRoutes].sort((a, b) => {
+        const aFav = favourites.includes(a.id) ? 0 : 1;
+        const bFav = favourites.includes(b.id) ? 0 : 1;
+        return aFav - bFav;
+    });
 
 
     return (
@@ -113,12 +126,27 @@ function BusRoutes() {
 
 
             <ul className="route-list">
-                {filteredRoutes.length === 0 ? (
+                {sortedRoutes.length === 0 ? (
                     <li>No routes found for this neighbourhood</li>
                 ) : (  
-                    filteredRoutes.map((route) => (
+                    sortedRoutes.map((route) => {
+                        const isFavourite = favourites.includes(route.id);
+                        
+                        return (
                     <li key={route.id} className="route-card">
                         <h3>
+                            <button
+                                className="favourite-button"
+                                onClick={() => toggleFavourite(route.id)}
+                                aria-label={
+                                    favourites.includes(route.id)
+                                    ? `Remove ${route.routeNumber} from favourites`
+                                    : `Add ${route.routeNumber} to favourites`
+                                }
+                                aria-pressed={favourites.includes(route.id)}
+                            >
+                                {isFavourite ? "★" : "☆"}
+                            </button>
                             {route.routeNumber} - {route.routeName}
                         </h3>
 
@@ -143,11 +171,12 @@ function BusRoutes() {
                             <strong>Neighbourhood(optional):</strong> {route.neighbourhood}
                         </p>
 
-                </li>
-                ))
-                )}
+                    </li>
+                );       
+            })
+        )}
             </ul>
-                </section>
+        </section>
     );
 }
 

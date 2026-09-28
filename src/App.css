@@ -201,3 +201,14 @@ footer li {
 .create-complaint button:hover {
   background-color: #005080;
 }
+
+/* Bus routes */
+.favourite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #f0a400;
+  margin-right: 0.5rem;
+  padding: 0; 
+}
