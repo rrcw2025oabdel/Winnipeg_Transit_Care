@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 interface BusStop {
     id: number;
     busStopNumber: number;  // 5 digit number eg. #20172
@@ -15,6 +17,7 @@ interface BusRoute {
         time: string; // use military time
     }
     busNumber?: number;  // Number on the side of the bus
+    neighbourhood?: string; 
 }
 
 function BusRoutes() {
@@ -35,6 +38,7 @@ function BusRoutes() {
                 time: "9:00",
             },
             busNumber: 5555, 
+            neighbourhood: "Forks",
         },
         
         { 
@@ -53,6 +57,7 @@ function BusRoutes() {
                 time: "00:00",
             },
             busNumber: 6666,
+            neighbourhood: "St. Norbert",
         },
 
         {
@@ -71,8 +76,19 @@ function BusRoutes() {
                 time: "13:15",
             },
             busNumber: 7777,
+            neighbourhood: "Saint Vital",
         },
     ];
+
+    const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
+
+    const neighbourhoods = ["All", ...Array.from(new Set(routes.map((r) => r.neighbourhood)))];
+
+    const filteredRoutes = 
+        selectedNeighbourhood === "All"
+        ? routes
+        : routes.filter((route) => route.neighbourhood === selectedNeighbourhood);
+
 
     return (
         <section className="bus-routes">
@@ -80,34 +96,57 @@ function BusRoutes() {
 
             <p>View Winnipeg Transit Bus Routes</p>
 
+            <div className="filter">
+                <label htmlFor="neighbourhood-filter">Filter By Neighbourhood: </label>
+                <select
+                    id="neighbourhood-filter"
+                    value={selectedNeighbourhood}
+                    onChange={(e) => setSelectedNeighbourhood(e.target.value)}
+                >
+                    {neighbourhoods.map((n) => (
+                        <option key={n} value={n}>
+                            {n}
+                        </option>
+                    ))}
+                    </select>
+            </div>
+
+
             <ul className="route-list">
                 { routes.map((route) => (
                     <li key={route.id} className="route-card">
-                    <h3>
-                        {route.routeNumber} - {route.routeName}
-                    </h3>
+                        <h3>
+                            {route.routeNumber} - {route.routeName}
+                        </h3>
 
-                    <p>{route.description}</p>
-                    <p>
-                        <strong>Weekday:</strong> {route.schedule.weekday}
-                    </p>
+                        <p>{route.description}</p>
+                        <p>
+                            <strong>Weekday:</strong> {route.schedule.weekday}
+                        </p>
 
-                    <p>
-                        <strong>Weekend:</strong> {route.schedule.weekend}
-                    </p>
-                    
-                    <p>
-                        <strong>Time:</strong> {route.schedule.time}
-                    </p>
+                        <p>
+                            <strong>Weekend:</strong> {route.schedule.weekend}
+                        </p>
+                        
+                        <p>
+                            <strong>Time:</strong> {route.schedule.time}
+                        </p>
 
-                    <p>
-                        <strong>Bus Number(optional):</strong> {route.busNumber}
-                    </p>
+                        <p>
+                            <strong>Bus Number(optional):</strong> {route.busNumber}
+                        </p>
+
+                        <p>
+                            <strong>Neighbourhood(optional):</strong> {route.neighbourhood}
+                        </p>
 
                 </li>
                 ))}
             </ul>
-            </section>
+            {filteredRoutes.length === 0 && (
+                <p>No routes found for the selected neighbourhoods.</p>    
+            )}
+                </section>
     );
 }
 
