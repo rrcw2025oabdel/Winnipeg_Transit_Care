@@ -202,7 +202,17 @@ footer li {
   background-color: #005080;
 }
 
-.transit-message-box {
+/* Bus routes */
+.favourite-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #f0a400;
+  margin-right: 0.5rem;
+  padding: 0; 
+
+ .transit-message-box {
   margin-top: 2rem;
   padding: 1rem;
   border-top: 2px solid #e9ecef;
