@@ -1,0 +1,101 @@
+:global(.my-complaints) > label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  color: #003055;
+}
+
+:global(.my-complaints) > label select {
+  padding: 8px 12px;
+  border: 1px solid #b8c4ce;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+
+:global(.complaint-list) {
+  list-style: none;
+  padding: 0;
+}
+
+:global(.complaint-card) {
+  position: relative;
+  padding: 24px 130px 24px 24px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e6ea;
+  border-left: 5px solid #f0a400;
+  border-radius: 0;
+  background: white;
+}
+
+:global(.complaint-card) > button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #c62828;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+:global(.my-complaints) > ul:not(:global(.complaint-list)) {
+  list-style: none;
+  padding: 0;
+}
+
+:global(.my-complaints) > ul:not(:global(.complaint-list)) > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  border: 1px solid #e1e6ea;
+  border-radius: 8px;
+  background: white;
+}
+
+:global(.my-complaints) > ul:not(:global(.complaint-list)) button {
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #218047;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+:global(.transit-message-box) button {
+  padding: 9px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #003055;
+  color: white;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+:global(.complaint-card) > button:hover,
+:global(.my-complaints) > ul:not(:global(.complaint-list)) button:hover,
+:global(.transit-message-box) button:hover {
+  filter: brightness(0.88);
+}
+
+@media (max-width: 600px) {
+  :global(.complaint-card) {
+    padding: 70px 24px 24px;
+  }
+
+  :global(.my-complaints) > ul:not(:global(.complaint-list)) > li {
+    flex-wrap: wrap;
+  }
+}

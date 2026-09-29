@@ -211,4 +211,10 @@ footer li {
   color: #f0a400;
   margin-right: 0.5rem;
   padding: 0; 
+
+ .transit-message-box {
+  margin-top: 2rem;
+  padding: 1rem;
+  border-top: 2px solid #e9ecef;
+  background-color: #f8f9fa;
 }
