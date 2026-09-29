@@ -1,8 +1,10 @@
+import styles from "./Footer.module.css";
+
 function Footer() {
     return (
-        <footer>
+        <footer className={styles.footer}>
             <p> Team Members </p>
-            <ul>
+            <ul className={styles.teamMembers}>
                 <li>Aubrey Fernandez</li>
                 <li>Abdelhamid Oughanem</li>
                 <li>Keith Robles</li>
