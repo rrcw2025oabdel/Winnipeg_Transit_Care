@@ -49,3 +49,50 @@ Users can report an issue related to a bus route. A complaint may contain inform
 
 Logged-in users can view a list of complaints they have submitted and track the current status of each complaint.
 
+## Sprint 1 (Work Done)
+
+### Abdelhamid Oughanem
+
+- Created the initial My Complaints component to display complaint information and statuses.
+- Rendered complaint entries from an initial list using React components.
+
+### Aubrey Fernandez
+
+- Created the initial Bus Routes component to display available route information.
+- Rendered route entries from an initial list using React components.
+
+### Keith Robles
+
+- Created the initial Bus Route Complaint component and its interface for reporting an issue.
+
+### Team Contributions
+
+- Set up the GitHub repository and initialized the project using Vite, React, and TypeScript.
+- Integrated the three feature components into the application.
+- Added the application header and footer with the project title and team members’ names.
+- Established consistent colours and shared styling.
+- Documented the project description, team members, and user stories in the README.
+- Used feature branches, pull requests, and peer reviews to integrate contributions.
+
+## Sprint 2 (Work Done)
+
+### Abdelhamid Oughanem
+
+- Developed My Complaints with status filtering and archive/restore actions using `useState` and CSS modules.
+- Implemented shared `transitMessage` state, passing its value and setter to each feature page through props.
+
+### Aubrey Fernandez
+
+- Developed Bus Routes with a filtered route list and a favourites button using `useState`.
+
+### Keith Robles
+
+- Developed Create Complaint with a live preview that updates as users type, plus Submit and Cancel actions using `useState`.
+
+### Team Contributions
+
+- Added navigation between feature pages using React Router.
+- Practised managing interactive interfaces with `useState`.
+- Discussed implementation decisions and completed peer reviews before integrating changes.
+
+

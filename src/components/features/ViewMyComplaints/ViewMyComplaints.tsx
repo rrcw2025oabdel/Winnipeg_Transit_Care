@@ -1,16 +1,19 @@
 import {useState} from "react";
 import "./ViewMyComplaints.module.css";
 
+// Props received from the parent component for the shared transit message.
 type ViewMyComplaintsProps = {
   transitMessage: string;
   setTransitMessage: (message: string) => void;
 };
 
+// Props used by the StatusFilter component.
 type statusFilterProps = {
   statusFilter: string;
   setStatusFilter: (status: string) => void;
 };
 
+// Defines the structure of a complaint.
 interface Complaint {
   complaintId: number;
   userId: number;
@@ -20,6 +23,7 @@ interface Complaint {
   status: string;
 }
 
+// Dropdown component used to filter complaints by status.
 function StatusFilter({
   statusFilter, setStatusFilter,
 }: statusFilterProps) {
@@ -42,14 +46,18 @@ function MyComplaints({
   transitMessage,
   setTransitMessage,
 }: ViewMyComplaintsProps) {
+  // Simulates the currently logged-in user.
     const currentUserId = 1;
+    // Stores the status currently selected in the filter.
     const [statusFilter, setStatusFilter] = useState("All");
+     // Stores the IDs of complaints that the user has archived.
     const [archivedIds, setArchivedIds] = useState<number[]>([]);
 
+    // Adds a complaint ID to the archived complaints list.
 function archiveComplaint(complaintId: number) {
   setArchivedIds((currentIds) => [...currentIds, complaintId]);
 }
-    
+     // Sample complaint data.
     const [complaints] = useState<Complaint[]>(
       [
     {
@@ -88,20 +96,24 @@ function archiveComplaint(complaintId: number) {
     },
       
     ]);
-
+    // Keeps only complaints belonging to the current user.
     const userComplaints = complaints.filter(
         (complaint) => complaint.userId === currentUserId
     );
+
+    // Keeps active complaints and applies the selected status filter.
     const filteredComplaints = userComplaints.filter(
   (complaint) =>
     !archivedIds.includes(complaint.complaintId) &&
     (statusFilter === "All" || complaint.status === statusFilter)
 
 );
+    // Gets complaints that have been archived by the user.
     const archivedComplaints = userComplaints.filter((complaint) =>
       archivedIds.includes(complaint.complaintId)
 );
 
+// Removes a complaint ID from the archived list.
 function restoreComplaint(complaintId: number) {
   setArchivedIds((currentIds) =>
     currentIds.filter((id) => id !== complaintId)
@@ -111,6 +123,7 @@ function restoreComplaint(complaintId: number) {
     return(
     
         <section className="my-complaints">
+        {/* Status filter */}
       <StatusFilter
       statusFilter={statusFilter}
       setStatusFilter={setStatusFilter}
@@ -119,6 +132,7 @@ function restoreComplaint(complaintId: number) {
 
       <p>Review the complaints you have submitted to Winnipeg Transit Care.</p>
 
+      {/* Active complaints */}
       <ul className="complaint-list">
         {filteredComplaints.map((complaint) => (
           <li key={complaint.complaintId} className="complaint-card">
@@ -142,10 +156,12 @@ function restoreComplaint(complaintId: number) {
           </li>
         ))}
       </ul>
+      {/* Message displayed when the selected filter has no results */}
       {filteredComplaints.length === 0 && (
   <p>No complaints match the selected status.</p>
 )}
 
+{/* Archived complaints */}
 <h3>Archived complaints</h3>
 
 {archivedComplaints.length === 0 ? (
@@ -165,6 +181,7 @@ function restoreComplaint(complaintId: number) {
     ))}
   </ul>
 )}
+    {/* Shared message that can also be accessed by other components */}
    <div className="transit-message-box">
       <p>{transitMessage}</p>
 {/*Button to update the transit message*/}
