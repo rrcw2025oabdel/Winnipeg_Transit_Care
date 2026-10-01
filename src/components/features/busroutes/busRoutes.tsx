@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 type BusRoutesProps = {
   transitMessage: string;
   setTransitMessage: (message: string) => void;
@@ -20,6 +22,7 @@ interface BusRoute {
         time: string; // use military time
     }
     busNumber?: number;  // Number on the side of the bus
+    neighbourhood?: string; 
 }
 
 function BusRoutes({
@@ -43,6 +46,7 @@ function BusRoutes({
                 time: "9:00",
             },
             busNumber: 5555, 
+            neighbourhood: "Forks",
         },
         
         { 
@@ -61,6 +65,7 @@ function BusRoutes({
                 time: "00:00",
             },
             busNumber: 6666,
+            neighbourhood: "St. Norbert",
         },
 
         {
@@ -79,8 +84,32 @@ function BusRoutes({
                 time: "13:15",
             },
             busNumber: 7777,
+            neighbourhood: "Saint Vital",
         },
     ];
+
+    const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
+    const [favourites, setFavourites] = useState<number[]>([]);
+    
+    const toggleFavourite = (id: number) => {
+        setFavourites((prev) =>
+            prev.includes(id) ? prev.filter((favID) => favID !== id) : [...prev, id]
+        );
+    };
+
+    const neighbourhoods = ["All", ...Array.from(new Set(routes.map((r) => r.neighbourhood)))];
+
+    const filteredRoutes = 
+        selectedNeighbourhood === "All"
+        ? routes
+        : routes.filter((route) => route.neighbourhood === selectedNeighbourhood);
+
+    const sortedRoutes = [...filteredRoutes].sort((a, b) => {
+        const aFav = favourites.includes(a.id) ? 0 : 1;
+        const bFav = favourites.includes(b.id) ? 0 : 1;
+        return aFav - bFav;
+    });
+
 
     return (
         
@@ -89,32 +118,72 @@ function BusRoutes({
 
             <p>View Winnipeg Transit Bus Routes</p>
 
+            <div className="filter">
+                <label htmlFor="neighbourhood-filter">Filter By Neighbourhood: </label>
+                <select
+                    id="neighbourhood-filter"
+                    value={selectedNeighbourhood}
+                    onChange={(e) => setSelectedNeighbourhood(e.target.value)}
+                >
+                    {neighbourhoods.map((n) => (
+                        <option key={n} value={n}>
+                            {n}
+                        </option>
+                    ))}
+                    </select>
+            </div>
+
+
             <ul className="route-list">
-                { routes.map((route) => (
+                {sortedRoutes.length === 0 ? (
+                    <li>No routes found for this neighbourhood</li>
+                ) : (  
+                    sortedRoutes.map((route) => {
+                        const isFavourite = favourites.includes(route.id);
+                        
+                        return (
                     <li key={route.id} className="route-card">
-                    <h3>
-                        {route.routeNumber} - {route.routeName}
-                    </h3>
+                        <h3>
+                            <button
+                                className="favourite-button"
+                                onClick={() => toggleFavourite(route.id)}
+                                aria-label={
+                                    favourites.includes(route.id)
+                                    ? `Remove ${route.routeNumber} from favourites`
+                                    : `Add ${route.routeNumber} to favourites`
+                                }
+                                aria-pressed={favourites.includes(route.id)}
+                            >
+                                {isFavourite ? "★" : "☆"}
+                            </button>
+                            {route.routeNumber} - {route.routeName}
+                        </h3>
 
-                    <p>{route.description}</p>
-                    <p>
-                        <strong>Weekday:</strong> {route.schedule.weekday}
-                    </p>
+                        <p>{route.description}</p>
+                        <p>
+                            <strong>Weekday:</strong> {route.schedule.weekday}
+                        </p>
 
-                    <p>
-                        <strong>Weekend:</strong> {route.schedule.weekend}
-                    </p>
-                    
-                    <p>
-                        <strong>Time:</strong> {route.schedule.time}
-                    </p>
+                        <p>
+                            <strong>Weekend:</strong> {route.schedule.weekend}
+                        </p>
+                        
+                        <p>
+                            <strong>Time:</strong> {route.schedule.time}
+                        </p>
 
-                    <p>
-                        <strong>Bus Number(optional):</strong> {route.busNumber}
-                    </p>
+                        <p>
+                            <strong>Bus Number(optional):</strong> {route.busNumber}
+                        </p>
 
-                </li>
-                ))}
+                        <p>
+                            <strong>Neighbourhood(optional):</strong> {route.neighbourhood}
+                        </p>
+
+                    </li>
+                );       
+            })
+        )}
             </ul>
             <p>{transitMessage}</p>
 {/*Button to update the transit message*/}
