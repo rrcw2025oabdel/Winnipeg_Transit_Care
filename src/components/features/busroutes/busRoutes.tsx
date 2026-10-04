@@ -88,6 +88,15 @@ function BusRoutes({
         },
     ];
 
+    const emptyForm = {
+        routeNumber: "",
+        routeName: "",
+        description: "",
+        time: "",
+        busNumber: "",
+        neighbourhood: "",
+    },
+
     const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
     const [favourites, setFavourites] = useState<number[]>([]);
     
