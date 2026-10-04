@@ -25,9 +25,18 @@ interface BusRoute {
     neighbourhood?: string; 
 }
 
+const emptyForm = {
+    routeNumber: "",
+    routeName: "",
+    description: "",
+    time: "",
+    busNumber: "",
+    neighbourhood: "",
+}
+
 function BusRoutes({
-  transitMessage,
-  setTransitMessage,
+    transitMessage,
+    setTransitMessage,
 }: BusRoutesProps) {
     const routes: BusRoute[] = [
         {
@@ -88,14 +97,6 @@ function BusRoutes({
         },
     ];
 
-    const emptyForm = {
-        routeNumber: "",
-        routeName: "",
-        description: "",
-        time: "",
-        busNumber: "",
-        neighbourhood: "",
-    },
 
     const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
     const [favourites, setFavourites] = useState<number[]>([]);
@@ -117,7 +118,37 @@ function BusRoutes({
         const aFav = favourites.includes(a.id) ? 0 : 1;
         const bFav = favourites.includes(b.id) ? 0 : 1;
         return aFav - bFav;
+
+    const [form, setForm] = useState(emptyForm);
+    const [errors, setErrors] = useState<Record<string, string>>({});
     });
+
+    const handleChange = (field: keyof typeof emptyForm, value: string) => { setform((prev) => ({ ...prev, [field]: value }));
+
+};
+
+// Returns an object of error messages
+    const validate = {
+        const newErrors = Record<string, string> = {};
+        const routeNumber = form.routeNumber.trim();
+        const routeName = form.routeName.trim();
+        const description = form.description.trim();
+        const busNumber = form.busNumber.trim();
+
+        if (!routeNumber) {
+            newErrors.routeNumber = "Route number is required";
+        } else if (routes.some((r) => r.routeNumber.toUpperCase() ===
+        routeNumber.toUpperCase())) { 
+        newErrors.routeNumber = "That route number already exist.";
+        }
+        if (!routeName) newErrors.routeName = "Route name is required.";
+        if (!description) newErrors.description = "Description is requred";
+
+        // military time hh:mm 
+        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(form.time)) {
+            newErrors.time = "Enter a time like 9:30 (24 hour, hh:mm).";
+        }
+        return newErrors;
 
 
     return (
