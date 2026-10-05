@@ -121,7 +121,6 @@ function BusRoutes({
         const routeNumber = form.routeNumber.trim();
         const routeName = form.routeName.trim();
         const description = form.description.trim();
-        const busNumber = form.busNumber.trim();
 
         if (!routeNumber) {
             newErrors.routeNumber = "Route number is required";
@@ -226,7 +225,7 @@ function BusRoutes({
                     <input
                         id="neighbourhood"
                         value={form.neighbourhood}
-                        onChange={(e) => handlechange("neighbourhood", e.target.value)}
+                        onChange={(e) => handleChange("neighbourhood", e.target.value)}
                         />
                 </div>
                 <button onClick={addRoute}>Add Route</button>
@@ -269,14 +268,21 @@ function BusRoutes({
                         <p>
                             <strong>Time:</strong> {route.schedule.time}
                         </p>
-
+                    {route.busNumber && (
                         <p>
                             <strong>Bus Number(optional):</strong> {route.busNumber}
-                        </p>
-
+                        </p>)}
+                    
+                    {route.neighbourhood && (
                         <p>
                             <strong>Neighbourhood(optional):</strong> {route.neighbourhood}
-                        </p>
+                        </p>)}
+
+                        <button
+                            onClick={() => deleteRoute(route.id)}
+                            aria-label={`Delete route ${route.routeNumber}`}
+                            >Delete Route
+                            </button>
 
                     </li>
                 );       
