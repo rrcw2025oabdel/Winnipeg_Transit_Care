@@ -212,6 +212,15 @@ function BusRoutes({
                 </div>
 
                 <div>
+                    <label htmlFor="routeName">Route Name</label>
+                    <input 
+                        id="routeName"
+                        value={form.routeName}
+                        onChange={(e) => handleChange("routeName", e.target.value)}
+                        />
+                        {errors.routeName && <p role="alert" className="error">{errors.routeName}</p>}
+                </div>
+                <div>
                     <label htmlFor="description">Description</label>
                     <input
                         id="description"
@@ -220,6 +229,17 @@ function BusRoutes({
                     />
                     {errors.description && <p role="alert" className="error">{errors.description}</p>}
                     </div>
+
+                <div>
+                    <label htmlFor="time">Time (hh:mm) </label>
+                    <input
+                        id="time"
+                        placeholder="09:30"
+                        value={form.time}
+                        onChange={(e) => handleChange("time", e.target.value)}
+                        />
+                        {errors.time && <p role="alert" className="error">{errors.time}</p>}
+                </div>
                 <div>
                     <label htmlFor="neighbourhood">Neighbourhood</label>
                     <input
