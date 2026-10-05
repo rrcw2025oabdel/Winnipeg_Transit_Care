@@ -1,0 +1,201 @@
+.my-complaints > label {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  color: #003055;
+}
+
+.my-complaints > label select {
+  padding: 8px 12px;
+  border: 1px solid #b8c4ce;
+  border-radius: 8px;
+  background: white;
+  font: inherit;
+}
+
+/* Complaint list */
+
+.complaint-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* Complaint card */
+
+.complaint-card {
+  position: relative;
+  padding: 24px 130px 24px 24px;
+  margin-bottom: 20px;
+  border: 1px solid #e1e6ea;
+  border-left: 5px solid #f0a400;
+  background: white;
+}
+
+/* Archive button */
+
+.complaint-card > button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  padding: 9px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #c62828;
+  color: white;
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.complaint-card > button:hover {
+  background-color: #a91f1f;
+}
+
+/* Archived complaints */
+
+.my-complaints > ul:not(.complaint-list) {
+  list-style: none;
+  padding: 0;
+}
+
+.my-complaints > ul:not(.complaint-list) > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 16px 20px;
+  margin-bottom: 12px;
+
+  border: 1px solid #e1e6ea;
+  border-radius: 8px;
+
+  background: white;
+}
+
+/* Restore button */
+
+.my-complaints > ul:not(.complaint-list) button {
+  padding: 9px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #218047;
+  color: white;
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.my-complaints > ul:not(.complaint-list) button:hover {
+  background-color: #196b3a;
+}
+
+/* Admin status form */
+
+.admin-status-form {
+  margin-top: 2rem;
+  padding: 1.5rem;
+
+  border: 1px solid #ddd;
+  border-radius: 8px;
+
+  background-color: #f8f9fa;
+}
+
+.admin-status-form h3 {
+  margin-top: 0;
+  color: #003055;
+}
+
+.admin-status-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-status-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.4rem;
+}
+
+.admin-status-form select,
+.admin-status-form input {
+  width: 100%;
+  padding: 0.7rem;
+
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+
+  box-sizing: border-box;
+}
+
+/* Admin Update Status button */
+
+.admin-status-form button {
+  width: fit-content;
+
+  padding: 9px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #003055;
+  color: white;
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.admin-status-form button:hover {
+  background-color: #f0a400;
+  color: #212529;
+}
+
+/* Transit message */
+
+.transit-message-box button {
+  padding: 9px 16px;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: #003055;
+  color: white;
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.transit-message-box button:hover {
+  filter: brightness(0.88);
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .complaint-card {
+    padding: 70px 24px 24px;
+  }
+
+  .my-complaints > ul:not(.complaint-list) > li {
+    flex-wrap: wrap;
+  }
+}
