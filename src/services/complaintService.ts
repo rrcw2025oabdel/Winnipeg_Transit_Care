@@ -4,6 +4,16 @@ import type {
     Complaint,
 } from "../types/complaint";
 
+class ValidationError extends Error {
+    errors: string[];
+
+    constructor(errors: string[]) {
+        super(errors.join(" "));
+        this.name = "ValidationError";
+        this.errors = errors;
+    }
+}
+
 function validateComplaint(input: CreateComplaint): void {
     const errors: string[] = [];
 
