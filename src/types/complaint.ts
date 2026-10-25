@@ -3,7 +3,7 @@ export interface Complaint {
   userId: number;
   route: string;
   title: string;
-  description: string;
+  description?: string;
   status: string;
 }
 
