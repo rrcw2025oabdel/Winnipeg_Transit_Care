@@ -1,5 +1,5 @@
 export interface BusStop {
-    routeNumber: string;
+    id: number;
     busStopNumber: number;  // 5 digit number eg. #20172
 }
 
