@@ -1,10 +1,9 @@
 import { useState } from "react";
+import { complaintService } from "../../../services/complaintService";
 import type { Complaint } from "../../../types/complaint";
 
 type CreateComplaintProps = {
   userId: number;
-  complaints: Complaint[];
-  setComplaints: (complaints: Complaint[]) => void;
   transitMessage: string;
   setTransitMessage: (message: string) => void;
 };
@@ -23,8 +22,6 @@ const availableRoutes: string[] = [
 
 function CreateComplaint({
   userId,
-  complaints,
-  setComplaints,
   transitMessage,
   setTransitMessage,
 }: CreateComplaintProps) {
@@ -36,7 +33,7 @@ function CreateComplaint({
     null
   );
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
@@ -45,34 +42,42 @@ function CreateComplaint({
       return;
     }
 
-    const newComplaint: Complaint = {
-      complaintId:
-        complaints.length > 0
-          ? Math.max(...complaints.map((c) => c.complaintId)) + 1
-          : 1,
-      userId,
-      route,
-      title,
-      description,
-      status: "open",
-    };
+    try {
+      // Validates then assigns Complaint ID
+      const created = await complaintService.create({
+        userId,
+        route,
+        title,
+        description,
+        status: "Submitted",
+      });
 
-    setComplaints([...complaints, newComplaint]);
-    setLatestComplaint(newComplaint);
+      setLatestComplaint(created);
 
-    setTitle("");
-    setDescription("");
-    setRoute(availableRoutes[0]);
+      setTitle("");
+      setDescription("");
+      setRoute(availableRoutes[0]);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to submit the complaint."
+      );
+    }
   }
 
-  function handleCancel() {
+  async function handleCancel() {
     if (!latestComplaint) return;
-    setComplaints(
-      complaints.filter((c) => c.complaintId !== latestComplaint.complaintId)
-    );
-    setLatestComplaint(null);
-  }
+    setError("");
 
+    try {
+      await complaintService.cancelByComplaintId(latestComplaint.complaintId);
+      setLatestComplaint(null);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Unable to cancel the complaint."
+      );
+    }
+  }
+  
   return (
     <section className="create-complaint">
       <h2>File a Complaint</h2>

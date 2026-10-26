@@ -5,10 +5,8 @@ import ViewMyComplaints from "./components/features/ViewMyComplaints/ViewMyCompl
 import BusRoutes from "./components/features/busroutes/busRoutes";
 import Layout from "./components/layout/Layout";
 import "./App.css";
-import type { Complaint } from "./types/complaint";
 
 function App() {
-    const [complaints, setComplaints] = useState<Complaint[]>([]);
     const [transitMessage, setTransitMessage] = useState(
         "Welcome aboard! Please keep your code behind the yellow line."
     );
@@ -42,8 +40,6 @@ function App() {
           element={
             <CreateComplaint
               userId={currentUserId}
-              complaints={complaints}
-              setComplaints={setComplaints}
               transitMessage={transitMessage}
               setTransitMessage={setTransitMessage}
             />
