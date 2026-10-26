@@ -1,91 +1,195 @@
-import { complaintRepository } from "../repositories/complaintRepository";
-import type {
-    CreateComplaint,
-    Complaint,
+import {
+  complaintStatuses,
+  type Complaint,
+  type ComplaintStatus,
+  type CreateComplaint,
 } from "../types/complaint";
 
-class ValidationError extends Error {
-    errors: string[];
+import { complaintRepository } from "../repositories/complaintRepository";
 
-    constructor(errors: string[]) {
-        super(errors.join(" "));
-        this.name = "ValidationError";
-        this.errors = errors;
-    }
+import { busRouteService } from "./busRouteService";
+
+// Validate the user ID
+function validateUserId(userId: number) {
+  if (
+    !Number.isInteger(userId) ||
+    userId < 1
+  ) {
+    throw new Error(
+      "Invalid user ID."
+    );
+  }
 }
 
-function validateComplaint(input: CreateComplaint): void {
-    const errors: string[] = [];
+// Get a complaint by its ID and validate ownership
+async function getOwnedComplaint(
+  complaintId: number,
+  userId: number
+): Promise<Complaint> {
+  validateUserId(userId);
 
-    if (input.title.trim().length < 1) {
-        errors.push(
-            "Please Fill the Title.",
-        );
-    }
+  const complaint =
+    await complaintRepository
+      .getByComplaintId(complaintId);
 
-    if (errors.length > 0) {
-        throw new ValidationError(errors);
-    }
+  if (
+    !complaint ||
+    complaint.userId !== userId
+  ) {
+    throw new Error(
+      "Complaint not found for this user."
+    );
+  }
+
+  return complaint;
 }
 
+// Complaint service
 export const complaintService = {
-    async getAll(): Promise<Complaint[]> {
-        return complaintRepository.getAll();
-    },
+  subscribe(listener: () => void) {
+    return complaintRepository.subscribe(
+      listener
+    );
+  },
 
-    async getForUser(
-        id: number,
-    ): Promise<Complaint | null> {
-        if (!Number.isInteger(id) || id < 1) {
-        return null;
-        }
+  async getForUser(
+    userId: number
+  ): Promise<Complaint[]> {
+    validateUserId(userId);
 
-        return complaintRepository.getForUser(id);
-    },
+    const complaints =
+      await complaintRepository.getAll();
 
-    async getByComplaintId(
-        id: number,
-    ): Promise<Complaint | null> {
-        if (!Number.isInteger(id) || id < 1) {
-        return null;
-        }
+    return complaints.filter(
+      (complaint) =>
+        complaint.userId === userId
+    );
+  },
+  // Create a new complaint
+  async create(
+    input: CreateComplaint
+  ): Promise<Complaint> {
+    validateUserId(input.userId);
 
-        return complaintRepository.getByComplaintId(id);
-    },
+    if (!input.title.trim()) {
+      throw new Error(
+        "Title is required."
+      );
+    }
 
-    async create(input: CreateComplaint): Promise<Complaint> {
-        validateComplaint(input);
+    if (!input.description?.trim()) {
+      throw new Error(
+        "Description is required."
+      );
+    }
 
-        const complaintInput: CreateComplaint = {
-            ...input,
-            title: input.title.trim(),
-            description: input.description?.trim() || undefined,
-        };
+    const routes =
+      await busRouteService.getAll();
 
-        return complaintRepository.create(complaintInput);
-    },
+    const validRoute = routes.some(
+      (route) =>
+        `${route.routeNumber} - ${route.routeName}` ===
+        input.route
+    );
 
-    async cancelByUserId(id: number): Promise<void> {
-        if (!Number.isInteger(id) || id < 1) {
-        throw new Error("Invalid User ID.");
-        }
+    if (!validRoute) {
+      throw new Error(
+        "Please select an available bus route."
+      );
+    }
 
-        const removed = await complaintRepository.cancelByUserId(id);
+    return complaintRepository.create({
+      userId: input.userId,
+      route: input.route,
+      title: input.title.trim(),
+      description:
+        input.description.trim(),
+      status: "Submitted",
+    });
+  },
 
-        if (!removed) {
-        throw new Error("Complaint not found.");
-        }
-    },
+  // Set the archived status of a complaint
+  async setArchived(
+    complaintId: number,
+    userId: number,
+    archived: boolean
+  ): Promise<Complaint> {
+    await getOwnedComplaint(
+      complaintId,
+      userId
+    );
 
-    async cancelByComplaintId(id: number): Promise<void> {
-        if (!Number.isInteger(id) || id < 1) {
-        throw new Error("Invalid complaint ID.");
-        }
+    return complaintRepository.update(
+      complaintId,
+      { archived }
+    );
+  },
 
-        const removed = await complaintRepository.cancelByComplaintId(id);
+  // Cancel a complaint by its ID
+  async cancelByComplaintId(
+    complaintId: number,
+    userId: number
+  ): Promise<void> {
+    await getOwnedComplaint(
+      complaintId,
+      userId
+    );
 
-        if (!removed) {
-        throw new Error("Complaint not found.");
-        }
-    },
+    const removed =
+      await complaintRepository.delete(
+        complaintId
+      );
+
+    if (!removed) {
+      throw new Error(
+        "Complaint not found."
+      );
+    }
+  },
+
+  
+  // Update the status of a complaint
+  async updateStatus(
+    complaintId: number,
+    status: string,
+    adminNote: string
+  ): Promise<Complaint> {
+    const complaint =
+      await complaintRepository
+        .getByComplaintId(complaintId);
+
+    if (!complaint) {
+      throw new Error(
+        "Please select an existing complaint."
+      );
+    }
+
+    if (
+      !complaintStatuses.includes(
+        status as ComplaintStatus
+      )
+    ) {
+      throw new Error(
+        "Please select a valid status."
+      );
+    }
+
+    if (
+      adminNote.trim().length < 5
+    ) {
+      throw new Error(
+        "Admin note must contain at least 5 characters."
+      );
+    }
+
+    return complaintRepository.update(
+      complaintId,
+      {
+        status:
+          status as ComplaintStatus,
+        latestAdminNote:
+          adminNote.trim(),
+      }
+    );
+  },
 };
