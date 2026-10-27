@@ -9,6 +9,7 @@ export const listedComplaints: Complaint[] = [
       description: 
         "The bus arrived approximately 30 minutes late.",
       status: "Submitted",
+      archived: false,
     },
     {
       complaintId: 2,
@@ -18,6 +19,7 @@ export const listedComplaints: Complaint[] = [
       description:
         "The bus passed the stop even though passengers were waiting and did not stop.",
       status: "In Progress",
+      archived: false,
     },
     {
       complaintId: 3,
@@ -27,6 +29,7 @@ export const listedComplaints: Complaint[] = [
       description:
         "The bus passed the stop even though passengers were waiting and did not stop.",
       status: "Resolved",
+      archived: false,
     },
     {
       complaintId: 4,
@@ -36,5 +39,6 @@ export const listedComplaints: Complaint[] = [
       description:
         "The bus was too crowded to allow more passengers.",
       status: "Resolved",
+      archived: false,
     },
 ]

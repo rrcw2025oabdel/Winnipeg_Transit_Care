@@ -1,66 +1,128 @@
 import { listedComplaints } from "../data/complaints";
+
 import type {
-    CreateComplaint,
-    Complaint,
+  Complaint,
+  CreateComplaint,
 } from "../types/complaint";
 
-let complaints: Complaint[] = listedComplaints.map((complaint) => ({
-    ...complaint,
-}))
+let complaints: Complaint[] =
+  structuredClone(listedComplaints);
 
-let nextId = Math.max(...complaints.map((complaint) => complaint.complaintId), 0) + 1;
+let nextId =
+  Math.max(
+    0,
+    ...complaints.map(
+      (complaint) => complaint.complaintId
+    )
+  ) + 1;
+
+const listeners = new Set<() => void>();
+
+function notifyChanges() {
+  listeners.forEach((listener) => listener());
+}
 
 export const complaintRepository = {
-    async getAll(): Promise<Complaint[]> {
-        return complaints.map((complaint) => ({
-        ...complaint,
-        }));
-    },
+  subscribe(listener: () => void) {
+    listeners.add(listener);
 
-    async getForUser(id: number): Promise<Complaint | null> {
-        const complaint = complaints.find(
-        (complaint) => complaint.userId === id,
-        );
+    return () => {
+      listeners.delete(listener);
+    };
+  },
+// Get all complaints
+  async getAll(): Promise<Complaint[]> {
+    return structuredClone(complaints);
+  },
+// Get a complaint by its ID
+  async getByComplaintId(
+    complaintId: number
+  ): Promise<Complaint | null> {
+    const complaint = complaints.find(
+      (item) =>
+        item.complaintId === complaintId
+    );
 
-        return complaint ? { ...complaint } : null;
-    },
+    return complaint
+      ? structuredClone(complaint)
+      : null;
+  },
 
-    async getByComplaintId(id: number): Promise<Complaint | null> {
-        const complaint = complaints.find(
-        (complaint) => complaint.complaintId === id,
-        );
+  // Create a new complaint
+  async create(
+    input: CreateComplaint & {
+      status: Complaint["status"];
+    }
+  ): Promise<Complaint> {
+    const complaint: Complaint = {
+      ...input,
+      complaintId: nextId++,
+      archived: false,
+    };
 
-        return complaint ? { ...complaint } : null;
-    },
+    complaints = [
+      ...complaints,
+      complaint,
+    ];
 
-    async create(input: CreateComplaint): Promise<Complaint> {
-        const complaint: Complaint = {
-        complaintId: nextId++,
-        ...input,
-        };
+    notifyChanges();
 
-        complaints = [...complaints, complaint];
+    return structuredClone(complaint);
+  },
+// Update an existing complaint
+  async update(
+    complaintId: number,
+    changes: Partial<
+      Omit<Complaint, "complaintId">
+    >
+  ): Promise<Complaint> {
+    const existing = complaints.find(
+      (item) =>
+        item.complaintId === complaintId
+    );
 
-        return { ...complaint };
-    },
+    if (!existing) {
+      throw new Error(
+        "Complaint not found."
+      );
+    }
 
-    async cancelByUserId(id: number): Promise<boolean> {
-        const originalLength = complaints.length;
+    const updated: Complaint = {
+      ...existing,
+      ...changes,
+      complaintId,
+    };
 
-        complaints = complaints.filter(
-        (complaint) => complaint.userId !== id,
-        );
+    complaints = complaints.map(
+      (item) =>
+        item.complaintId === complaintId
+          ? updated
+          : item
+    );
 
-        return complaints.length < originalLength;
-    },
+    notifyChanges();
 
-    async cancelByComplaintId(id: number): Promise<boolean> {
-        const originalLength = complaints.length;
+    return structuredClone(updated);
+  },
+// Delete a complaint by its ID
+  async delete(
+    complaintId: number
+  ): Promise<boolean> {
+    const originalLength =
+      complaints.length;
 
-        complaints = complaints.filter(
-        (complaint) => complaint.complaintId !== id,
-        );
+    complaints = complaints.filter(
+      (item) =>
+        item.complaintId !== complaintId
+    );
 
-        return complaints.length < originalLength;
-    },
+    const removed =
+      complaints.length < originalLength;
+
+    if (removed) {
+      notifyChanges();
+    }
+
+    return removed;
+  },
 };
