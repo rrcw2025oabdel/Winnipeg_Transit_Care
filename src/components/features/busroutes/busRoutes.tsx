@@ -1,327 +1,507 @@
-import { useState } from "react";
+import {
+  useState,
+  type FormEvent,
+} from "react";
 
-type BusRoutesProps = {
-  transitMessage: string;
-  setTransitMessage: (message: string) => void;
-};
+import type { BusRoute } from "../../../types/busRoutes";
 
-interface BusStop {
-    id: number;
-    busStopNumber: number;  // 5 digit number eg. #20172
-}
+import { useBusRoutes } from "../../../hooks/useBusRoutes";
+import { useTransitMessage } from "../../../hooks/useTransitMessage";
 
-interface BusRoute {
-    id: number;
-    routeNumber: string;  // eg BLUE, D14
-    routeName: string;  // BLUE St. Norbert, D14 - Ellice
-    description: string; // 
-    stops: BusStop[];
-    schedule: {
-        weekday: string;
-        weekend: string;
-        time: string; // use military time
-    }
-    busNumber?: number;  // Number on the side of the bus
-    neighbourhood?: string; 
-}
-
-const initialRoutes: BusRoute[] = [
-{
-        id: 1, 
-        routeNumber: "D14",
-        routeName: "Ellice - Airport",
-        description: "Bus from the Forks to the Airport",
-        stops: [
-            { id: 101, busStopNumber: 30011 },
-            { id: 102, busStopNumber: 30012 },
-            { id: 103, busStopNumber: 30013 },
-        ],
-        schedule: {
-            weekday: "Monday",
-            weekend: "NA",
-            time: "9:00",
-        },
-        busNumber: 5555, 
-        neighbourhood: "Forks",
-    },
-    
-    { 
-        id: 2, 
-        routeNumber: "BLUE",
-        routeName: "St. Norbert",
-        description: "Blue line from Assiniboia Downs to St. Norbert",
-        stops: [
-            { id: 104, busStopNumber: 30014 },
-            { id: 105, busStopNumber: 30015 },
-            { id: 106, busStopNumber: 30016 },
-        ],
-        schedule: {
-            weekday: "NA",
-            weekend: "Saturday", 
-            time: "00:00",
-        },
-        busNumber: 6666,
-        neighbourhood: "St. Norbert",
-    },
-
-    {
-        id: 3, 
-        routeNumber: "15",
-        routeName: "Saint Vital",
-        description: "Route through the Saint Vital area",
-        stops: [
-            { id: 107, busStopNumber: 30017 },
-            { id: 108, busStopNumber: 30018 },
-            { id: 109, busStopNumber: 30019 },
-        ],
-        schedule: {
-            weekday: "Friday",
-            weekend: "Sunday",
-            time: "13:15",
-        },
-        busNumber: 7777,
-        neighbourhood: "Saint Vital",
-    },
-];
+import { busRouteService } from "../../../services/busRouteService";
 
 const emptyForm = {
-    routeNumber: "",
-    routeName: "",
-    description: "",
-    time: "",
-    busNumber: "",
-    neighbourhood: "",
-}
+  routeNumber: "",
+  routeName: "",
+  description: "",
+  time: "",
+  busNumber: "",
+  neighbourhood: "",
+};
 
-function BusRoutes({
+function BusRoutes() {
+  const {
+    routes,
+    loading,
+    error: loadError,
+  } = useBusRoutes();
+
+  const {
     transitMessage,
     setTransitMessage,
-}: BusRoutesProps) {
-    const [routes, setRoutes] = useState<BusRoute[]>(initialRoutes);
-    const [selectedNeighbourhood, setSelectedNeighbourhood] = useState<string>("All");
-    const [favourites, setFavourites] = useState<number[]>([]);
-    const [form, setForm] = useState(emptyForm);
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    
-    
-    const toggleFavourite = (id: number) => {
-        setFavourites((prev) =>
-            prev.includes(id) ? prev.filter((favID) => favID !== id) : [...prev, id]
-        );
-    };
+  } = useTransitMessage();
 
-    const handleChange = (field: keyof typeof emptyForm, value: string) => { setForm((prev) => ({ ...prev, [field]: value }));
-    
-    };
+  const [selectedNeighbourhood, setSelectedNeighbourhood] =
+    useState("All");
 
+  const [favourites, setFavourites] =
+    useState<number[]>([]);
 
-// Returns an object of error messages
-    const validate = () => {
-        const newErrors: Record<string, string> = {};
-        const routeNumber = form.routeNumber.trim();
-        const routeName = form.routeName.trim();
-        const description = form.description.trim();
+  const [form, setForm] =
+    useState(emptyForm);
 
-        if (!routeNumber) {
-            newErrors.routeNumber = "Route number is required";
-        } else if (routes.some((r) => r.routeNumber.toUpperCase() ===
-        routeNumber.toUpperCase())) { 
-        newErrors.routeNumber = "That route number already exist.";
-        }
-        if (!routeName) newErrors.routeName = "Route name is required.";
-        if (!description) newErrors.description = "Description is requred";
+  const [editingId, setEditingId] =
+    useState<number | null>(null);
 
-        // military time hh:mm 
-        if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(form.time)) {
-            newErrors.time = "Enter a time like 9:30 (24 hour, hh:mm).";
-        }
-        return newErrors;
-    };
+  const [error, setError] =
+    useState("");
 
-    const addRoute = () => {
-        const newErrors = validate();
-        setErrors(newErrors);
-        if (Object.keys(newErrors).length > 0) return;
+  const [saving, setSaving] =
+    useState(false);
 
-        const newRoute: BusRoute = {
-            id: Date.now(),
-            routeNumber: form.routeNumber.trim(),
-            routeName: form.routeName.trim(),
-            description: form.description.trim(),
-            stops: [],
-            schedule: {
-                weekday: "NA",
-                weekend: "NA",
-                time: form.time.trim(),
-            },
-            busNumber: form.busNumber ? parseInt(form.busNumber.trim()) : undefined,
-            neighbourhood: form.neighbourhood.trim() || undefined,
-        };
-        setRoutes((prev) => [...prev, newRoute]);
-        setForm(emptyForm);
-    };
-
-    const deleteRoute = (id: number) => {
-        setRoutes((prev) => prev.filter((route) => route.id !== id));
-        setFavourites((prev) => prev.filter((favID) => favID !== id));
-    };
-
-    const neighbourhoods = ["All", ...Array.from(new Set(initialRoutes.map((r) => r.neighbourhood)))];
-
-    const filteredRoutes = 
-        selectedNeighbourhood === "All"
-        ? routes
-        : routes.filter((route) => route.neighbourhood === selectedNeighbourhood);
-
-    const sortedRoutes = [...filteredRoutes].sort((a, b) => {
-        const aFav = favourites.includes(a.id) ? 0 : 1;
-        const bFav = favourites.includes(b.id) ? 0 : 1;
-        return aFav - bFav;
-    });
-    return (
-        
-        <section className="bus-routes">
-            <h2>Bus Routes</h2>
-
-            <p>View Winnipeg Transit Bus Routes</p>
-
-            <div className="filter">
-                <label htmlFor="neighbourhood-filter">Filter By Neighbourhood: </label>
-                <select
-                    id="neighbourhood-filter"
-                    value={selectedNeighbourhood}
-                    onChange={(e) => setSelectedNeighbourhood(e.target.value)}
-                >
-                    {neighbourhoods.map((n) => (
-                        <option key={n} value={n}>
-                            {n}
-                        </option>
-                    ))}
-                    </select>
-            </div>
-            <div className= "add-route">    
-                <h3>Add a Route</h3>
-                <div>
-                    <label htmlFor="routeNumber">Route Number</label>
-                    <input
-                        id="routeNumber"
-                        value={form.routeNumber}
-                        onChange={(e) => handleChange("routeNumber", e.target.value)}
-                        />
-                    {errors.routeNumber && <p role="alert" className="error">{errors.routeNumber}</p>}
-                </div>
-
-                <div>
-                    <label htmlFor="routeName">Route Name</label>
-                    <input 
-                        id="routeName"
-                        value={form.routeName}
-                        onChange={(e) => handleChange("routeName", e.target.value)}
-                        />
-                        {errors.routeName && <p role="alert" className="error">{errors.routeName}</p>}
-                </div>
-                <div>
-                    <label htmlFor="description">Description</label>
-                    <input
-                        id="description"
-                        value={form.description}
-                        onChange={(e) => handleChange("description", e.target.value)}
-                    />
-                    {errors.description && <p role="alert" className="error">{errors.description}</p>}
-                    </div>
-
-                <div>
-                    <label htmlFor="time">Time (hh:mm) </label>
-                    <input
-                        id="time"
-                        placeholder="09:30"
-                        value={form.time}
-                        onChange={(e) => handleChange("time", e.target.value)}
-                        />
-                        {errors.time && <p role="alert" className="error">{errors.time}</p>}
-                </div>
-                <div>
-                    <label htmlFor="neighbourhood">Neighbourhood</label>
-                    <input
-                        id="neighbourhood"
-                        value={form.neighbourhood}
-                        onChange={(e) => handleChange("neighbourhood", e.target.value)}
-                        />
-                </div>
-                <button onClick={addRoute}>Add Route</button>
-                </div>
-
-            <ul className="route-list">
-                {sortedRoutes.length === 0 ? (
-                    <li>No routes found for this neighbourhood</li>
-                ) : (  
-                    sortedRoutes.map((route) => {
-                        const isFavourite = favourites.includes(route.id);
-                        
-                        return (
-                    <li key={route.id} className="route-card">
-                        <h3>
-                            <button
-                                className="favourite-button"
-                                onClick={() => toggleFavourite(route.id)}
-                                aria-label={
-                                    favourites.includes(route.id)
-                                    ? `Remove ${route.routeNumber} from favourites`
-                                    : `Add ${route.routeNumber} to favourites`
-                                }
-                                aria-pressed={favourites.includes(route.id)}
-                            >
-                                {isFavourite ? "★" : "☆"}
-                            </button>
-                            {route.routeNumber} - {route.routeName}
-                        </h3>
-
-                        <p>{route.description}</p>
-                        <p>
-                            <strong>Weekday:</strong> {route.schedule.weekday}
-                        </p>
-
-                        <p>
-                            <strong>Weekend:</strong> {route.schedule.weekend}
-                        </p>
-                        
-                        <p>
-                            <strong>Time:</strong> {route.schedule.time}
-                        </p>
-                    {route.busNumber && (
-                        <p>
-                            <strong>Bus Number(optional):</strong> {route.busNumber}
-                        </p>)}
-                    
-                    {route.neighbourhood && (
-                        <p>
-                            <strong>Neighbourhood(optional):</strong> {route.neighbourhood}
-                        </p>)}
-
-                        <button
-                            onClick={() => deleteRoute(route.id)}
-                            aria-label={`Delete route ${route.routeNumber}`}
-                            >Delete Route
-                            </button>
-
-                    </li>
-                );       
-            })
-        )}
-            </ul>
-            <p>{transitMessage}</p>
-{/*Button to update the transit message*/}
-<button
-  onClick={() =>
-    setTransitMessage(
-      "Next stop: Production. Please commit before exiting."
-    )
+  function handleChange(
+    field: keyof typeof emptyForm,
+    value: string
+  ) {
+    setForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }));
   }
->
-  New Transit Message
-</button>
-            </section>
+
+  function toggleFavourite(id: number) {
+    setFavourites((current) =>
+      current.includes(id)
+        ? current.filter(
+            (item) => item !== id
+          )
+        : [...current, id]
     );
+  }
+
+  function editRoute(route: BusRoute) {
+    setEditingId(route.id);
+    setError("");
+
+    setForm({
+      routeNumber: route.routeNumber,
+      routeName: route.routeName,
+      description: route.description,
+      time: route.schedule.time,
+      busNumber:
+        route.busNumber?.toString() ?? "",
+      neighbourhood:
+        route.neighbourhood ?? "",
+    });
+  }
+
+  function clearForm() {
+    setEditingId(null);
+    setForm(emptyForm);
+    setError("");
+  }
+
+  async function handleSave(
+    event: FormEvent<HTMLFormElement>
+  ) {
+    event.preventDefault();
+
+    setError("");
+    setSaving(true);
+
+    const existing = routes.find(
+      (route) => route.id === editingId
+    );
+
+    try {
+      await busRouteService.save(
+        {
+          routeNumber: form.routeNumber,
+          routeName: form.routeName,
+          description: form.description,
+
+          stops: existing?.stops ?? [],
+
+          schedule: {
+            weekday:
+              existing?.schedule.weekday ??
+              "NA",
+
+            weekend:
+              existing?.schedule.weekend ??
+              "NA",
+
+            time: form.time,
+          },
+
+          busNumber: form.busNumber.trim()
+            ? Number(form.busNumber)
+            : undefined,
+
+          neighbourhood:
+            form.neighbourhood,
+        },
+        editingId ?? undefined
+      );
+
+      clearForm();
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Unable to save route."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deleteRoute(id: number) {
+    setError("");
+
+    try {
+      await busRouteService.delete(id);
+
+      setFavourites((current) =>
+        current.filter(
+          (item) => item !== id
+        )
+      );
+
+      if (editingId === id) {
+        clearForm();
+      }
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Unable to delete route."
+      );
+    }
+  }
+
+  const neighbourhoods = [
+    "All",
+
+    ...new Set(
+      routes
+        .map(
+          (route) =>
+            route.neighbourhood
+        )
+        .filter(
+          (name): name is string =>
+            Boolean(name)
+        )
+    ),
+  ];
+
+  const filteredRoutes =
+    selectedNeighbourhood === "All"
+      ? routes
+      : routes.filter(
+          (route) =>
+            route.neighbourhood ===
+            selectedNeighbourhood
+        );
+
+  const sortedRoutes = [
+    ...filteredRoutes,
+  ].sort((first, second) => {
+    const firstPriority =
+      favourites.includes(first.id)
+        ? 0
+        : 1;
+
+    const secondPriority =
+      favourites.includes(second.id)
+        ? 0
+        : 1;
+
+    return (
+      firstPriority - secondPriority
+    );
+  });
+
+  return (
+    <section className="bus-routes">
+      <h2>Bus Routes</h2>
+
+      <p>
+        View Winnipeg Transit Bus Routes.
+        Schedule data is for classroom testing.
+      </p>
+
+      {loading && (
+        <p>Loading routes...</p>
+      )}
+
+      {(error || loadError) && (
+        <p role="alert" className="error">
+          {error || loadError}
+        </p>
+      )}
+
+      <div className="filter">
+        <label htmlFor="neighbourhood-filter">
+          Filter by neighbourhood
+        </label>
+
+        <select
+          id="neighbourhood-filter"
+          value={selectedNeighbourhood}
+          onChange={(event) =>
+            setSelectedNeighbourhood(
+              event.target.value
+            )
+          }
+        >
+          {neighbourhoods.map(
+            (name) => (
+              <option
+                key={name}
+                value={name}
+              >
+                {name}
+              </option>
+            )
+          )}
+        </select>
+      </div>
+
+      <div className="add-route">
+        <h3>
+          {editingId === null
+            ? "Add a Route"
+            : "Edit Route"}
+        </h3>
+
+        <form onSubmit={handleSave}>
+          <div>
+            <label htmlFor="route-number">
+              Route Number
+            </label>
+
+            <input
+              id="route-number"
+              value={form.routeNumber}
+              onChange={(event) =>
+                handleChange(
+                  "routeNumber",
+                  event.target.value
+                )
+              }
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="route-name">
+              Route Name
+            </label>
+
+            <input
+              id="route-name"
+              value={form.routeName}
+              onChange={(event) =>
+                handleChange(
+                  "routeName",
+                  event.target.value
+                )
+              }
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="route-description">
+              Description
+            </label>
+
+            <input
+              id="route-description"
+              value={form.description}
+              onChange={(event) =>
+                handleChange(
+                  "description",
+                  event.target.value
+                )
+              }
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="route-time">
+              Time or Operating Range
+            </label>
+
+            <input
+              id="route-time"
+              placeholder="09:30, 06:00-00:00 or NA"
+              value={form.time}
+              onChange={(event) =>
+                handleChange(
+                  "time",
+                  event.target.value
+                )
+              }
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="route-bus-number">
+              Bus Number — optional
+            </label>
+
+            <input
+              id="route-bus-number"
+              value={form.busNumber}
+              onChange={(event) =>
+                handleChange(
+                  "busNumber",
+                  event.target.value
+                )
+              }
+            />
+          </div>
+
+          <div>
+            <label htmlFor="route-neighbourhood">
+              Neighbourhood — optional
+            </label>
+
+            <input
+              id="route-neighbourhood"
+              value={form.neighbourhood}
+              onChange={(event) =>
+                handleChange(
+                  "neighbourhood",
+                  event.target.value
+                )
+              }
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={saving || loading}
+          >
+            {saving
+              ? "Saving..."
+              : editingId === null
+                ? "Add Route"
+                : "Save Route"}
+          </button>
+
+          <button
+            type="button"
+            onClick={clearForm}
+            disabled={saving}
+          >
+            Clear Form
+          </button>
+        </form>
+      </div>
+
+      <ul className="route-list">
+        {sortedRoutes.map((route) => {
+          const isFavourite =
+            favourites.includes(route.id);
+
+          return (
+            <li
+              key={route.id}
+              className="route-card"
+            >
+              <h3>
+                <button
+                  type="button"
+                  className="favourite-button"
+                  aria-pressed={isFavourite}
+                  aria-label={
+                    isFavourite
+                      ? `Remove ${route.routeNumber} from favourites`
+                      : `Add ${route.routeNumber} to favourites`
+                  }
+                  onClick={() =>
+                    toggleFavourite(route.id)
+                  }
+                >
+                  {isFavourite ? "★" : "☆"}
+                </button>
+
+                {" "}
+                {route.routeNumber}
+                {" — "}
+                {route.routeName}
+              </h3>
+
+              <p>{route.description}</p>
+
+              <p>
+                <strong>Weekday:</strong>{" "}
+                {route.schedule.weekday}
+              </p>
+
+              <p>
+                <strong>Weekend:</strong>{" "}
+                {route.schedule.weekend}
+              </p>
+
+              <p>
+                <strong>Time:</strong>{" "}
+                {route.schedule.time}
+              </p>
+
+              {route.busNumber !== undefined && (
+                <p>
+                  <strong>Bus Number:</strong>{" "}
+                  {route.busNumber}
+                </p>
+              )}
+
+              {route.neighbourhood && (
+                <p>
+                  <strong>Neighbourhood:</strong>{" "}
+                  {route.neighbourhood}
+                </p>
+              )}
+
+              <button
+                type="button"
+                onClick={() =>
+                  editRoute(route)
+                }
+              >
+                Edit Route
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  void deleteRoute(route.id);
+                }}
+              >
+                Delete Route
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+
+      {!loading &&
+        sortedRoutes.length === 0 && (
+          <p>
+            No routes found for this neighbourhood.
+          </p>
+        )}
+
+      <p>{transitMessage}</p>
+
+      <button
+        type="button"
+        onClick={() =>
+          setTransitMessage(
+            "Next stop: Production. Please commit before exiting."
+          )
+        }
+      >
+        New Transit Message
+      </button>
+    </section>
+  );
 }
 
 export default BusRoutes;
