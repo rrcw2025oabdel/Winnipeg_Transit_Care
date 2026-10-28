@@ -199,3 +199,88 @@
     flex-wrap: wrap;
   }
 }
+
+/* Separate admin feedback from the customer's complaint. */
+.my-complaints .admin-updates {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid #dce3ea;
+}
+
+.my-complaints .admin-updates h4 {
+  margin: 0 0 16px;
+  color: #073654;
+  font-size: 1rem;
+}
+
+/* Shared appearance for each feedback record. */
+.my-complaints .admin-update {
+  margin-bottom: 12px;
+  padding: 16px 18px;
+  border: 1px solid #dce3ea;
+  border-left-width: 4px;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.my-complaints .admin-update:last-child {
+  margin-bottom: 0;
+}
+
+.my-complaints .admin-update p {
+  margin: 8px 0 0;
+  line-height: 1.6;
+  color: #334155;
+}
+
+/* Latest response. */
+.my-complaints .admin-update-latest {
+  background: #eef9f2;
+  border-color: #b8dfc6;
+  border-left-color: #237447;
+}
+
+/* Previous responses. */
+.my-complaints .admin-update-previous {
+  background: #f5f7fa;
+  border-left-color: #94a3b8;
+}
+
+/* Labels clearly distinguish latest and previous responses. */
+.my-complaints .admin-update .admin-update-label {
+  display: inline-block;
+  margin: 0 0 4px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.my-complaints .admin-update-latest .admin-update-label {
+  background: #d5efdf;
+  color: #185631;
+}
+
+.my-complaints .admin-update-previous .admin-update-label {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.my-complaints .admin-update-status {
+  font-weight: 600;
+}
+
+/* Visually separate the admin form from the customer cards. */
+.my-complaints .admin-status-form {
+  margin-top: 32px;
+  padding: 24px;
+  background: #f0f6fc;
+  border: 1px solid #b8cfe2;
+  border-top: 5px solid #073654;
+  border-radius: 10px;
+}
+
+.my-complaints .admin-status-form h3 {
+  margin-top: 0;
+  color: #073654;
+}
