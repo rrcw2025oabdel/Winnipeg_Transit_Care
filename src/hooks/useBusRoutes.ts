@@ -2,7 +2,15 @@ import { busRouteService } from "../services/busRouteService";
 
 import { useAsyncList } from "./useAsyncList";
 
-// useBusRoutes hook
+/**
+ * Returns:
+ * - routes: shared route records
+ * - loading: whether the latest request is pending
+ * - error: the latest loading error or an empty string
+ * 
+ * The hook manages presentation lifecycle.
+ * Business rules and data access remain in service and repository
+ */
 export function useBusRoutes() {
   const {
     records,
