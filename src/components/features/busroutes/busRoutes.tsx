@@ -19,6 +19,19 @@ const emptyForm = {
   neighbourhood: "",
 };
 
+/**
+ * Uses useBusRoutes to load shared route recods and refresh 
+ * the display when repository data changes.
+ * 
+ * buseRouteService validates route input and deals with
+ * creat, update, and delete commands.
+ * 
+ * busRouteRepository ows data access and importas the initial route fixtures
+ * 
+ * Form drafts, filter selection, favouriting remain local presentation state
+ * 
+ */
+
 function BusRoutes() {
   const {
     routes,
