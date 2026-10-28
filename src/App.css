@@ -210,7 +210,9 @@ footer li {
   font-size: 1.2rem;
   color: #f0a400;
   margin-right: 0.5rem;
-  padding: 0; 
+  padding: 0;
+}
+
 
  .transit-message-box {
   margin-top: 2rem;
@@ -218,4 +220,3 @@ footer li {
   border-top: 2px solid #e9ecef;
   background-color: #f8f9fa;
  }
-}
