@@ -1,5 +1,5 @@
 import type { Complaint } from "../types/complaint";
-
+// This file contains a list of predefined complaints for testing and demonstration purposes.
 export const listedComplaints: Complaint[] = [
     {
       complaintId: 1,
