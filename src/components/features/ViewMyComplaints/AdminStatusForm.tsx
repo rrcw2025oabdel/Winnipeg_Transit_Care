@@ -9,9 +9,17 @@ import { complaintStatuses } from "../../../types/complaint";
 
 import { useComplaints } from "../../../hooks/useComplaints";
 
-import { complaintService } from "../../../services/complaintService";
+import { complaintUpdateService } from "../../../services/complaintUpdateService";
 
 
+/**
+ * Uses useComplaints to display shared complaint options.
+ *
+ * complaintUpdateService validates the admin submission,
+ * saves feedback and changes the shared complaint status.
+ *
+ * This component manages form drafts and displayed feedback.
+ */
 function AdminStatusForm() {
   const {
     complaints,
@@ -47,7 +55,7 @@ function AdminStatusForm() {
     setSaving(true);
 
     try {
-      await complaintService.updateStatus(
+      await complaintUpdateService.create(
         Number(selectedId),
         status,
         note

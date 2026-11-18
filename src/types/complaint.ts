@@ -16,7 +16,6 @@ export interface Complaint {
   status: string;
   archived: boolean;
 
-  latestAdminNote?: string;
 }
 
 export interface CreateComplaint {
