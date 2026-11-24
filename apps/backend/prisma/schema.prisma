@@ -4,6 +4,7 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,79 +14,46 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Aubrey - Bus Route, ServiceDay, BusStop, RouteSchedule
-
-enum ServiceDay {
-  Weekday
-  Saturday
-  Sunday
-}
-
+// Aubrey - Bus Route
 model BusRoute {
-  id              Int         @id @default(autoincrement())
-  routeNumber     String      @unique
-  routeName       String
-  desciption      String
-  busNumber       Int
-  neighbourhood   String
-  stops           BusStop[]
-  schedule       RouteSchedule[]
+  id            Int     @id @default(autoincrement())
+  routeNumber   String  @unique
+  routeName     String
+  description   String
+  busNumber     Int?
+  neighbourhood String?
+  weekday       String
+  weekend       String
+  time          String
+
+  stops         BusStop[]
+  complaints    Complaint[]
 }
 
+// Aubrey - Bus Stop
 model BusStop {
-  id              Int         @id @default(autoincrement())
-  routeId         Int
-  busStopNumber   Int
-  route           BusRoute    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  id            Int @id @default(autoincrement())
+  busStopNumber Int
+  routeId       Int
+
+  route BusRoute @relation(fields: [routeId], references: [id])
 
   @@unique([routeId, busStopNumber])
-  @@unique([routeId])
-
 }
-
-model RouteSchedule {
-  id          Int     @id @default(autoincrement())
-  routeId     Int     
-  serviceDay  ServiceDay
-  time        String
-  route       BusRoute   @relation(fields: [routeId], references: [id], onDelete: Cascade)
-
-  @@unique([routeId, serviceDay])
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Keith - Complaint
+model Complaint {
+  complaintId Int     @id @default(autoincrement())
+  userId      Int
+  routeId     Int
+  title       String
+  description String?
+  status      String  @default("Submitted")
+  archived    Boolean @default(false)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  route   BusRoute          @relation(fields: [routeId], references: [id])
+  updates ComplaintUpdate[]
+}
 
 // Abdel - Complaint Update
 model ComplaintUpdate {
