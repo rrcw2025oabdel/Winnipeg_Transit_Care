@@ -13,25 +13,48 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Aubrey - Bus Route
+// Aubrey - Bus Route, ServiceDay, BusStop, RouteSchedule
+
+enum ServiceDay {
+  Weekday
+  Saturday
+  Sunday
+}
+
+model BusRoute {
+  id              Int         @id @default(autoincrement())
+  routeNumber     String      @unique
+  routeName       String
+  desciption      String
+  busNumber       Int
+  neighbourhood   String
+  stops           BusStop[]
+  schedule       RouteSchedule[]
+}
+
+model BusStop {
+  id              Int         @id @default(autoincrement())
+  routeId         Int
+  busStopNumber   Int
+  route           BusRoute    @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, busStopNumber])
+  @@unique([routeId])
+
+}
+
+model RouteSchedule {
+  id          Int     @id @default(autoincrement())
+  routeId     Int     
+  serviceDay  ServiceDay
+  time        String
+  route       BusRoute   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  @@unique([routeId, serviceDay])
+}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// Aubrey - Bus Stop
 
 
 
