@@ -96,3 +96,9 @@ Logged-in users can view a list of complaints they have submitted and track the 
 - Discussed implementation decisions and completed peer reviews before integrating changes.
 
 
+## Sprint 4
+## Database set up
+- Docker desktop must be installed and running
+- docker compose up -d to start, docker compose down to stop
+- docker compose down -v wipes the database completely
+- Copy apps/backend/.env.example to apps/backend/.env

@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: wtc-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: transitcare_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - wtc-pgdata:/var/lib/postgresql/data
+
+volumes:
+  wtc-pgdata:
