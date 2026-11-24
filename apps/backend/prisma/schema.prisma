@@ -12,3 +12,65 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Aubrey - Bus Route
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Aubrey - Bus Stop
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Keith - Complaint
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Abdel - Complaint Update
+model ComplaintUpdate {
+  id          Int      @id @default(autoincrement())
+  complaintId Int
+  status      String
+  adminNote   String
+  createdAt   DateTime @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [complaintId], onDelete: Cascade)
+}
