@@ -3,18 +3,8 @@ import type {
   CreateComplaintUpdate,
 } from "../types/complaintUpdate";
 
-// Importing the initial fixtures for complaint updates
-import { complaintUpdateTestData } from "../data/complaintUpdates";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-// Creating a local copy of the complaint updates data to work with
-let updates =
-  structuredClone(complaintUpdateTestData);
-
-let nextId =
-  Math.max(
-    0,
-    ...updates.map((update) => update.id)
-  ) + 1;
 
 const listeners = new Set<() => void>();
 
@@ -22,12 +12,9 @@ function notifyChanges() {
   listeners.forEach((listener) => listener());
 }
 
-/**
- * This function handles data access for complaint-update records. 
- * It imports the initial fixtures and provides CRUD methods for 
- * managing complaint updates.
- */
 export const complaintUpdateRepository = {
+
+  // Subscribing to repository changes.
   subscribe(listener: () => void) {
     listeners.add(listener);
 
@@ -35,82 +22,58 @@ export const complaintUpdateRepository = {
       listeners.delete(listener);
     };
   },
-  // Get all complaint updates
-  async getAll(): Promise<ComplaintUpdate[]> {
-    return structuredClone(updates);
-  },
 
-  // Get a complaint update by its ID
-  async getById(
-    id: number
-  ): Promise<ComplaintUpdate | null> {
-    const update = updates.find(
-      (item) => item.id === id
+  // Retrieving complaint updates from the backend.
+  async getForUser(
+    userId: number
+  ): Promise<ComplaintUpdate[]> {
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/complaint-updates?userId=${userId}`
     );
 
-    return update
-      ? structuredClone(update)
-      : null;
-  },
-
-  // Create a new complaint update
-  async create(
-    input: CreateComplaintUpdate
-  ): Promise<ComplaintUpdate> {
-    const update: ComplaintUpdate = {
-      ...input,
-      id: nextId++,
-    };
-
-    updates = [...updates, update];
-
-    notifyChanges();
-
-    return structuredClone(update);
-  },
- // Update an existing complaint update
-  async update(
-    id: number,
-    adminNote: string
-  ): Promise<ComplaintUpdate> {
-    const existing = updates.find(
-      (item) => item.id === id
-    );
-
-    if (!existing) {
+    if (!response.ok) {
       throw new Error(
-        "Complaint update not found."
+        "Failed to retrieve complaint updates."
       );
     }
 
-    const updated: ComplaintUpdate = {
-      ...existing,
-      adminNote,
-    };
+    return response.json();
+  },
 
-    updates = updates.map((item) =>
-      item.id === id ? updated : item
+  // Creating administrator feedback.
+  async create(
+    input: CreateComplaintUpdate
+  ): Promise<ComplaintUpdate> {
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/complaint-updates`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(input),
+      }
     );
+
+    if (!response.ok) {
+      const error = await response.json().catch(
+        () => null
+      );
+
+      throw new Error(
+        error?.errors?.join(" ") ||
+        error?.message ||
+        "Failed to create complaint update."
+      );
+    }
+
+    const update: ComplaintUpdate =
+      await response.json();
 
     notifyChanges();
 
-    return structuredClone(updated);
-  },
-  // Delete a complaint update by its ID
-  async delete(id: number): Promise<boolean> {
-    const originalLength = updates.length;
-
-    updates = updates.filter(
-      (item) => item.id !== id
-    );
-
-    const removed =
-      updates.length < originalLength;
-
-    if (removed) {
-      notifyChanges();
-    }
-
-    return removed;
+    return update;
   },
 };
