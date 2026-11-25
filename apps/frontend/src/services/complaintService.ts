@@ -5,6 +5,10 @@ import type {
 
 import { complaintRepository } from "../repositories/complaintRepository";
 import { busRouteService } from "./busRouteService";
+// Abdel: Importing the complaintUpdateRepository to allow my complaint page to refresh when a complaint is updated or feedback is added.
+import {
+  complaintUpdateRepository,
+} from "../repositories/complaintUpdateRepository";
 
 // Validate the user ID.
 function validateUserId(userId: number) {
@@ -31,19 +35,30 @@ async function getOwnedComplaint(
 }
 
 export const complaintService = {
+  // Abdel:Allowing my complaint page to refresh when a complaint is updated or feedback is added.
   subscribe(listener: () => void) {
-    return complaintRepository.subscribe(listener);
-  },
+  const unsubscribeComplaints =
+    complaintRepository.subscribe(listener);
 
-  async getForUser(userId: number): Promise<Complaint[]> {
-    validateUserId(userId);
+  const unsubscribeUpdates =
+    complaintUpdateRepository.subscribe(listener);
 
-    const complaints = await complaintRepository.getAll();
+  return () => {
+    unsubscribeComplaints();
+    unsubscribeUpdates();
+  };
+},
 
-    return complaints.filter(
-      (complaint) => complaint.userId === userId
-    );
-  },
+// Retrieving complaints belonging to a specific user.
+async getForUser(userId: number): Promise<Complaint[]> {
+  validateUserId(userId);
+
+  const complaints = await complaintRepository.getAll();
+
+  return complaints.filter(
+    (complaint) => complaint.userId === userId
+  );
+},
 
   async create(input: CreateComplaint): Promise<Complaint> {
     validateUserId(input.userId);
