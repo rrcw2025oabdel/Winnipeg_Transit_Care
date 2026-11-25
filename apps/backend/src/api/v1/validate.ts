@@ -5,27 +5,34 @@ import type {
   NextFunction,
 } from "express";
 
-type ValidationSchema = (body: unknown) => string[];
+import type { ZodType } from "zod";
 
-
+// middleware for validating requests.
 export const validateRequest = (
-  schema: ValidationSchema
+  schema: ZodType,
+  source: "body" | "query" | "params" = "body"
 ) => {
   return (
     req: Request,
     res: Response,
     next: NextFunction
   ): void => {
-    const errors = schema(req.body);
 
-    if (errors.length > 0) {
+    const result = schema.safeParse(req[source]);
+
+    if (!result.success) {
       res.status(400).json({
         message: "Validation failed.",
-        errors,
+        errors: result.error.issues.map(
+          (issue) => issue.message
+        ),
       });
 
       return;
     }
+
+    // Storing the validated and transformed data.
+    res.locals.validatedData = result.data;
 
     next();
   };

@@ -1,59 +1,37 @@
 
-export type ComplaintStatus =
-  | "Submitted"
-  | "In Progress"
-  | "Resolved";
+import { z } from "zod";
 
-export interface CreateComplaintUpdate {
-  complaintId: number;
-  status: ComplaintStatus;
-  adminNote: string;
-}
+// Valid complaint statuses.
+export const complaintStatuses = [
+  "Submitted",
+  "In Progress",
+  "Resolved",
+] as const;
 
-// Validate the complaint update request body.
-export const complaintUpdateSchema = (
-  body: unknown
-): string[] => {
-  const errors: string[] = [];
+// Validate the creation of a complaint update.
+export const complaintUpdateSchema = z.object({
+  complaintId: z.number().int().positive(),
 
-  if (!body || typeof body !== "object") {
-    return ["Request body is required."];
-  }
+  status: z.enum(complaintStatuses),
 
-  const data = body as Record<string, unknown>;
+  adminNote: z.string().trim().min(
+    5,
+    "Admin note must contain at least 5 characters."
+  ),
+});
 
-  // Validate the complaint ID.
-  if (
-    typeof data.complaintId !== "number" ||
-    !Number.isInteger(data.complaintId) ||
-    data.complaintId <= 0
-  ) {
-    errors.push("A valid complaint ID is required.");
-  }
+// Validate the user ID from the query string.
+export const complaintUpdateQuerySchema = z.object({
+  userId: z.string().regex(/^[1-9]\d*$/)
+    .transform(Number)
+    .pipe(z.number().int().positive()),
+});
 
-  // Validate the complaint status.
-  const validStatuses = [
-    "Submitted",
-    "In Progress",
-    "Resolved",
-  ];
+// Generate TypeScript types from the schemas.
+export type CreateComplaintUpdate = z.infer<
+  typeof complaintUpdateSchema
+>;
 
-  if (
-    typeof data.status !== "string" ||
-    !validStatuses.includes(data.status)
-  ) {
-    errors.push("Invalid complaint status.");
-  }
-
-  // Validate the administrator note.
-  if (
-    typeof data.adminNote !== "string" ||
-    data.adminNote.trim().length < 5
-  ) {
-    errors.push(
-      "Admin note must contain at least 5 characters."
-    );
-  }
-
-  return errors;
-};
+export type ComplaintUpdateQuery = z.infer<
+  typeof complaintUpdateQuerySchema
+>;
