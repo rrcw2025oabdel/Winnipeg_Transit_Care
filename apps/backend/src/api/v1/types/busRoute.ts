@@ -13,3 +13,4 @@ export interface BusRoute {
     busNumber: number;
     neighbourhood: string;
 }
+
