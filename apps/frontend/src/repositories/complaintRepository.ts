@@ -1,128 +1,58 @@
-import { listedComplaints } from "../data/complaints";
+import type { Complaint, CreateComplaint } from "../types/complaint";
 
-import type {
-  Complaint,
-  CreateComplaint,
-} from "../types/complaint";
-
-let complaints: Complaint[] =
-  structuredClone(listedComplaints);
-
-let nextId =
-  Math.max(
-    0,
-    ...complaints.map(
-      (complaint) => complaint.complaintId
-    )
-  ) + 1;
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/api/v1/complaints`;
 
 const listeners = new Set<() => void>();
-
 function notifyChanges() {
   listeners.forEach((listener) => listener());
+}
+
+async function readError(response: Response, fallback: string) {
+  const body = await response.json().catch(() => null);
+  return new Error(body?.errors?.join(" ") || body?.message || fallback);
 }
 
 export const complaintRepository = {
   subscribe(listener: () => void) {
     listeners.add(listener);
-
-    return () => {
-      listeners.delete(listener);
-    };
-  },
-// Get all complaints
-  async getAll(): Promise<Complaint[]> {
-    return structuredClone(complaints);
-  },
-// Get a complaint by its ID
-  async getByComplaintId(
-    complaintId: number
-  ): Promise<Complaint | null> {
-    const complaint = complaints.find(
-      (item) =>
-        item.complaintId === complaintId
-    );
-
-    return complaint
-      ? structuredClone(complaint)
-      : null;
+    return () => { listeners.delete(listener); };
   },
 
-  // Create a new complaint
-  async create(
-    input: CreateComplaint & {
-      status: Complaint["status"];
-    }
-  ): Promise<Complaint> {
-    const complaint: Complaint = {
-      ...input,
-      complaintId: nextId++,
-      archived: false,
-    };
+  async getForUser(userId: number): Promise<Complaint[]> {
+    const response = await fetch(`${BASE_URL}?userId=${userId}`);
+    if (!response.ok) throw await readError(response, "Failed to retrieve complaints.");
+    return response.json();
+  },
 
-    complaints = [
-      ...complaints,
-      complaint,
-    ];
-
+  async create(input: CreateComplaint): Promise<Complaint> {
+    const response = await fetch(BASE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    if (!response.ok) throw await readError(response, "Failed to create complaint.");
+    const complaint: Complaint = await response.json();
     notifyChanges();
-
-    return structuredClone(complaint);
+    return complaint;
   },
-// Update an existing complaint
-  async update(
-    complaintId: number,
-    changes: Partial<
-      Omit<Complaint, "complaintId">
-    >
-  ): Promise<Complaint> {
-    const existing = complaints.find(
-      (item) =>
-        item.complaintId === complaintId
-    );
 
-    if (!existing) {
-      throw new Error(
-        "Complaint not found."
-      );
-    }
-
-    const updated: Complaint = {
-      ...existing,
-      ...changes,
-      complaintId,
-    };
-
-    complaints = complaints.map(
-      (item) =>
-        item.complaintId === complaintId
-          ? updated
-          : item
-    );
-
+  async setArchived(complaintId: number, userId: number, archived: boolean): Promise<Complaint> {
+    const response = await fetch(`${BASE_URL}/${complaintId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, archived }),
+    });
+    if (!response.ok) throw await readError(response, "Failed to update complaint.");
+    const complaint: Complaint = await response.json();
     notifyChanges();
-
-    return structuredClone(updated);
+    return complaint;
   },
-// Delete a complaint by its ID
-  async delete(
-    complaintId: number
-  ): Promise<boolean> {
-    const originalLength =
-      complaints.length;
 
-    complaints = complaints.filter(
-      (item) =>
-        item.complaintId !== complaintId
-    );
-
-    const removed =
-      complaints.length < originalLength;
-
-    if (removed) {
-      notifyChanges();
-    }
-
-    return removed;
+  async delete(complaintId: number, userId: number): Promise<void> {
+    const response = await fetch(`${BASE_URL}/${complaintId}?userId=${userId}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw await readError(response, "Failed to cancel complaint.");
+    notifyChanges(); // 204: no body
   },
 };
