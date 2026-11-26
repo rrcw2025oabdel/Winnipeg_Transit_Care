@@ -39,8 +39,8 @@ function CreateComplaint() {
     setTransitMessage,
   } = useTransitMessage();
 
-  const [selectedRoute, setSelectedRoute] =
-    useState("");
+  const [selectedRouteId, setSelectedRouteId] =
+    useState<number | null>(null);
 
   const [title, setTitle] =
     useState("");
@@ -57,16 +57,11 @@ function CreateComplaint() {
   const [latestComplaint, setLatestComplaint] =
     useState<Complaint | null>(null);
 
-  const availableRoutes = routes.map(
-    (route) =>
-      `${route.routeNumber} - ${route.routeName}`
-  );
+  const routeId = routes.some((r) => r.id === selectedRouteId)
+    ? selectedRouteId!
+    : routes[0]?.id;
 
-  const route = availableRoutes.includes(
-    selectedRoute
-  )
-    ? selectedRoute
-    : availableRoutes[0] ?? "";
+  const routeLabel = routes.find((r) => r.id === routeId);
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -74,23 +69,28 @@ function CreateComplaint() {
     event.preventDefault();
 
     setError("");
+
+    if (routeId === undefined) {
+      setError("No route selected.");
+      return;
+    }
+
     setSaving(true);
 
     try {
       const created =
         await complaintService.create({
           userId: currentUserId,
-          route,
+          routeId,
           title,
           description,
-          status: "Open",
         });
 
       setLatestComplaint(created);
 
       setTitle("");
       setDescription("");
-      setSelectedRoute("");
+      setSelectedRouteId(null);
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -151,25 +151,20 @@ function CreateComplaint() {
 
           <select
             id="complaint-route"
-            value={route}
+            value={routeId ?? ""}
             onChange={(event) =>
-              setSelectedRoute(
-                event.target.value
+              setSelectedRouteId(
+                Number(event.target.value)
               )
             }
             disabled={routesLoading}
             required
           >
-            {availableRoutes.map(
-              (label) => (
-                <option
-                  key={label}
-                  value={label}
-                >
-                  {label}
-                </option>
-              )
-            )}
+            {routes.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.routeNumber} - {r.routeName}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -225,7 +220,9 @@ function CreateComplaint() {
 
         <p>
           <strong>Route:</strong>{" "}
-          {route || "No routes available"}
+          {routeLabel
+            ? `${routeLabel.routeNumber} - ${routeLabel.routeName}`
+            : "No routes available"}
         </p>
 
         <p>

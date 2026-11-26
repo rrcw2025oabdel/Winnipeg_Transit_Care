@@ -10,18 +10,18 @@ export type ComplaintStatus =
 export interface Complaint {
   complaintId: number;
   userId: number;
+  routeId: number;
   route: string;
   title: string;
   description?: string;
   status: string;
   archived: boolean;
-
+  createdAt: string;
 }
 
 export interface CreateComplaint {
   userId: number;
-  route: string;
+  routeId: number;
   title: string;
   description?: string;
-  status: string;
 }
