@@ -33,7 +33,7 @@ function toFrontEnd(row: RouteRow): BusRoute {
             busStopNumber: s.busStopNumber,
         })),
         schedule: {
-            weekeday: row.weekday,
+            weekday: row.weekday,
             weekend: row.weekend,
             time: row.time,
         },

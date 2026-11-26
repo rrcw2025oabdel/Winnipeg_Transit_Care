@@ -1,7 +1,6 @@
 import type { BusRoute } from "../types/busRoutes";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/v1/bus-routes`;
 
 const listeners = new Set<() => void>();
 
@@ -20,7 +19,7 @@ export const busRouteRepository = {
   },
 // Get all bus routes
   async getAll(): Promise<BusRoute[]> {
-    const response = await fetch(`${API_BASE_URL}/bus-routes`);
+    const response = await fetch(`${API_URL}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch bus routes.");
@@ -35,7 +34,7 @@ return response.json();
   async getById(
     id: number
   ): Promise<BusRoute | null> {
-    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`);
+    const response = await fetch(`${API_URL}/${id}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch bus route.");
@@ -48,12 +47,14 @@ return response.json();
   async create(
     input: Omit<BusRoute, "id">
   ): Promise<BusRoute> {
-    const response = await fetch(`${API_BASE_URL}/bus-routes`, {
+    const { schedule, ...rest } = input;
+    const body = { ...rest, ...schedule };
+    const response = await fetch(`${API_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -71,12 +72,15 @@ return response.json();
     id: number,
     input: Omit<BusRoute, "id">
   ): Promise<BusRoute> {
-    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`, {
+    const { schedule, ...rest } = input;
+    const body = { ...rest, ...schedule };
+
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -90,7 +94,7 @@ return response.json();
 
 // Delete a bus route by its ID
   async delete(id: number): Promise<void> {
-    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
     });
 
