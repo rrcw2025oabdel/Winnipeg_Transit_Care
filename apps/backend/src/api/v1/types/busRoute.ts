@@ -9,7 +9,7 @@ export interface BusRoute {
     routeName: string;
     description: string;
     stops: BusStop[];
-    schedule: { weekeday: string; weekend: string; time: string };
+    schedule: { weekday: string; weekend: string; time: string };
     busNumber: number;
     neighbourhood: string;
 }
