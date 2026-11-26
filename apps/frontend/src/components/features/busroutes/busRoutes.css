@@ -1,0 +1,272 @@
+/* Bus Routes page */
+
+.bus-routes {
+  color: #334155;
+}
+
+.bus-routes h2,
+.bus-routes h3 {
+  color: #003052;
+}
+
+/* Neighbourhood filter */
+
+.bus-routes .filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.bus-routes .filter label {
+  font-weight: 600;
+  color: #003052;
+}
+
+.bus-routes .filter select {
+  padding: 10px 14px;
+  min-width: 180px;
+  border: 1px solid #b8c5d1;
+  border-radius: 6px;
+  background-color: white;
+  color: #334155;
+  font: inherit;
+}
+
+/* Add and edit form */
+
+.bus-routes .add-route {
+  background-color: #eff5fa;
+  border: 1px solid #c5d6e5;
+  border-top: 4px solid #003052;
+  border-radius: 10px;
+  padding: 24px;
+  margin: 24px 0;
+  scroll-margin-top: 20px;
+}
+
+.bus-routes .add-route h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 21px;
+}
+
+.bus-routes .form-description {
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.bus-routes .route-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.bus-routes .route-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.bus-routes .full-width {
+  grid-column: 1 / -1;
+}
+
+.bus-routes .route-field label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #003052;
+}
+
+.bus-routes .route-field input,
+.bus-routes .route-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #b8c5d1;
+  border-radius: 6px;
+  background-color: white;
+  color: #334155;
+  font: inherit;
+}
+
+.bus-routes .route-field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.bus-routes .route-field input:focus,
+.bus-routes .route-field textarea:focus,
+.bus-routes .filter select:focus {
+  outline: 2px solid #2563a6;
+  outline-offset: 1px;
+}
+
+.bus-routes .route-field small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+/* Buttons */
+
+.bus-routes .route-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.bus-routes .route-btn {
+  padding: 10px 18px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bus-routes .route-btn-primary {
+  background-color: #003052;
+  color: white;
+}
+
+.bus-routes .route-btn-primary:hover {
+  background-color: #004875;
+}
+
+.bus-routes .route-btn-secondary {
+  background-color: white;
+  color: #003052;
+  border-color: #b8c5d1;
+}
+
+.bus-routes .route-btn-secondary:hover {
+  background-color: #e2e8f0;
+}
+
+.bus-routes .route-btn-danger {
+  background-color: #c62828;
+  color: white;
+}
+
+.bus-routes .route-btn-danger:hover {
+  background-color: #a51f1f;
+}
+
+.bus-routes .route-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Bus route cards */
+
+.bus-routes .route-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bus-routes .route-card {
+  background-color: white;
+  border: 1px solid #dce3ea;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 20px;
+  overflow-wrap: anywhere;
+}
+
+.bus-routes .route-card h3 {
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bus-routes .route-card p {
+  margin: 12px 0;
+  line-height: 1.5;
+}
+
+.bus-routes .favourite-button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: #d58b00;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.bus-routes .favourite-button:hover {
+  color: #b87500;
+}
+
+/* Error messages */
+
+.bus-routes .error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+/* Empty state */
+
+.bus-routes .empty-routes {
+  padding: 20px;
+  text-align: center;
+  background-color: #f5f7f9;
+  border-radius: 8px;
+  color: #64748b;
+}
+
+/* Transit message */
+
+.bus-routes .route-transit-message {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #f5f7f9;
+  border-top: 1px solid #dce3ea;
+  border-radius: 6px;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+
+  .bus-routes .route-form {
+    grid-template-columns: 1fr;
+  }
+
+  .bus-routes .add-route {
+    padding: 16px;
+  }
+
+  .bus-routes .filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bus-routes .filter select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bus-routes .route-actions {
+    flex-direction: column;
+  }
+
+  .bus-routes .route-btn {
+    width: 100%;
+  }
+
+  .bus-routes .route-card {
+    padding: 16px;
+  }
+}

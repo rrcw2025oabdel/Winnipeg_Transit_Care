@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+// Aubrey - Bus Route
+model BusRoute {
+  id            Int     @id @default(autoincrement())
+  routeNumber   String  @unique
+  routeName     String
+  description   String
+  busNumber     Int?
+  neighbourhood String?
+  weekday       String
+  weekend       String
+  time          String
+
+  stops      BusStop[]
+  complaints Complaint[]
+}
+
+// Aubrey - Bus Stop
+model BusStop {
+  id            Int @id @default(autoincrement())
+  busStopNumber Int
+  routeId       Int
+
+  route BusRoute @relation(fields: [routeId], references: [id])
+
+  @@unique([routeId, busStopNumber])
+}
+
+// Keith - Complaint
+model Complaint {
+  complaintId Int      @id @default(autoincrement())
+  userId      Int
+  routeId     Int
+  title       String
+  description String?
+  status      String   @default("Submitted")
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  route   BusRoute          @relation(fields: [routeId], references: [id])
+  updates ComplaintUpdate[]
+}
+
+// Abdel - Complaint Update
+model ComplaintUpdate {
+  id          Int      @id @default(autoincrement())
+  complaintId Int
+  status      String
+  adminNote   String
+  createdAt   DateTime @default(now())
+
+  complaint Complaint @relation(fields: [complaintId], references: [complaintId], onDelete: Cascade)
+}
