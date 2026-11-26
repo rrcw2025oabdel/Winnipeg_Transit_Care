@@ -1,15 +1,7 @@
 import type { BusRoute } from "../types/busRoutes";
 
-import { SampleBusRoutes } from "../data/busRoutes.testdata";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-let routes: BusRoute[] =
-  structuredClone(SampleBusRoutes);
-
-let nextId =
-  Math.max(
-    0,
-    ...routes.map((route) => route.id)
-  ) + 1;
 
 const listeners = new Set<() => void>();
 
@@ -28,81 +20,86 @@ export const busRouteRepository = {
   },
 // Get all bus routes
   async getAll(): Promise<BusRoute[]> {
-    return structuredClone(routes);
+    const response = await fetch(`${API_BASE_URL}/bus-routes`);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch bus routes.");
+    }
+
+return response.json();
   },
 
-  // Get a bus route by its ID
+
+
+// Get a bus route by its ID
   async getById(
     id: number
   ): Promise<BusRoute | null> {
-    const route = routes.find(
-      (item) => item.id === id
-    );
+    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`);
 
-    return route
-      ? structuredClone(route)
-      : null;
+    if (!response.ok) {
+      throw new Error("Failed to fetch bus route.");
+    }
+
+    return response.json();
   },
+
 // Create a new bus route
   async create(
     input: Omit<BusRoute, "id">
   ): Promise<BusRoute> {
-    const route: BusRoute = {
-      ...input,
-      id: nextId++,
-    };
+    const response = await fetch(`${API_BASE_URL}/bus-routes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    });
 
-    routes = [...routes, route];
+    if (!response.ok) {
+      throw new Error("Failed to create bus route.");
+    }
 
     notifyChanges();
 
-    return structuredClone(route);
+    return response.json();
   },
+
+
 // Update an existing bus route
   async update(
     id: number,
     input: Omit<BusRoute, "id">
   ): Promise<BusRoute> {
-    const existing = routes.find(
-      (item) => item.id === id
-    );
+    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(input),
+    });
 
-    if (!existing) {
-      throw new Error(
-        "Bus route not found."
-      );
+    if (!response.ok) {
+      throw new Error("Failed to update bus route.");
     }
-
-    const updated: BusRoute = {
-      ...input,
-      id,
-    };
-
-    routes = routes.map((route) =>
-      route.id === id
-        ? updated
-        : route
-    );
 
     notifyChanges();
 
-    return structuredClone(updated);
+    return response.json();
   },
+
 // Delete a bus route by its ID
-  async delete(id: number): Promise<boolean> {
-    const originalLength = routes.length;
+  async delete(id: number): Promise<void> {
+    const response = await fetch(`${API_BASE_URL}/bus-routes/${id}`, {
+      method: "DELETE",
+    });
 
-    routes = routes.filter(
-      (route) => route.id !== id
-    );
-
-    const removed =
-      routes.length < originalLength;
-
-    if (removed) {
-      notifyChanges();
+    if (!response.ok) {
+      throw new Error("Failed to delete bus route.");
     }
 
-    return removed;
+    notifyChanges();
+
+    return;
   },
 };
