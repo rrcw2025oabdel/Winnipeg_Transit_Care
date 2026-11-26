@@ -130,13 +130,6 @@ export const busRouteService = {
   
 // Delete a bus route by its ID
   async delete(id: number): Promise<void> {
-    const removed =
-      await busRouteRepository.delete(id);
-
-    if (!removed) {
-      throw new Error(
-        "Bus route not found."
-      );
-    }
-  },
-};
+    await busRouteRepository.delete(id);
+    },
+  }
