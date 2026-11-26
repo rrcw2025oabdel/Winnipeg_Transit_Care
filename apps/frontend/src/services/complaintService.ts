@@ -1,11 +1,7 @@
-import type {
-  Complaint,
-  CreateComplaint,
-} from "../types/complaint";
-
+import type {CreateComplaint} from "../types/complaint";
 import { complaintRepository } from "../repositories/complaintRepository";
-import { busRouteService } from "./busRouteService";
-// Abdel: Importing the complaintUpdateRepository to allow my complaint page to refresh when a complaint is updated or feedback is added.
+// Abdel: Importing the complaintUpdateRepository to allow my complaint page to refresh when 
+// a complaint is updated or feedback is added.
 import {
   complaintUpdateRepository,
 } from "../repositories/complaintUpdateRepository";
@@ -17,104 +13,50 @@ function validateUserId(userId: number) {
   }
 }
 
-// Retrieve a complaint and validate ownership.
-async function getOwnedComplaint(
-  complaintId: number,
-  userId: number
-): Promise<Complaint> {
-  validateUserId(userId);
-
-  const complaint =
-    await complaintRepository.getByComplaintId(complaintId);
-
-  if (!complaint || complaint.userId !== userId) {
-    throw new Error("Complaint not found for this user.");
-  }
-
-  return complaint;
-}
-
 export const complaintService = {
-  // Abdel:Allowing my complaint page to refresh when a complaint is updated or feedback is added.
+  // Abdel: Allowing my complaint page to refresh when a complaint is updated or feedback is added.
   subscribe(listener: () => void) {
-  const unsubscribeComplaints =
-    complaintRepository.subscribe(listener);
+    const unsubscribeComplaints =
+      complaintRepository.subscribe(listener);
 
-  const unsubscribeUpdates =
-    complaintUpdateRepository.subscribe(listener);
+    const unsubscribeUpdates =
+      complaintUpdateRepository.subscribe(listener);
 
-  return () => {
-    unsubscribeComplaints();
-    unsubscribeUpdates();
-  };
-},
+    return () => {
+      unsubscribeComplaints();
+      unsubscribeUpdates();
+    };
+  },
 
-// Retrieving complaints belonging to a specific user.
-async getForUser(userId: number): Promise<Complaint[]> {
-  validateUserId(userId);
+  // Retrieving complaints belonging to a specific user.
+  async getForUser(userId: number) {
+    validateUserId(userId);
+    return complaintRepository.getForUser(userId);
+  },
 
-  const complaints = await complaintRepository.getAll();
-
-  return complaints.filter(
-    (complaint) => complaint.userId === userId
-  );
-},
-
-  async create(input: CreateComplaint): Promise<Complaint> {
+  // Creates Complaints 
+  async create(input: CreateComplaint) {
     validateUserId(input.userId);
-
-    if (!input.title.trim()) {
-      throw new Error("Title is required.");
-    }
-
-    if (!input.description?.trim()) {
-      throw new Error("Description is required.");
-    }
-
-    const routes = await busRouteService.getAll();
-
-    const validRoute = routes.some(
-      (route) =>
-        `${route.routeNumber} - ${route.routeName}` === input.route
-    );
-
-    if (!validRoute) {
+    if (!input.title.trim()) throw new Error("Title is required.");
+    if (!input.description?.trim()) throw new Error("Description is required.");
+    if (!Number.isInteger(input.routeId) || input.routeId < 1)
       throw new Error("Please select an available bus route.");
-    }
-
     return complaintRepository.create({
-      userId: input.userId,
-      route: input.route,
+      ...input,
       title: input.title.trim(),
       description: input.description.trim(),
-      status: "Submitted",
     });
   },
 
-  async setArchived(
-    complaintId: number,
-    userId: number,
-    archived: boolean
-  ): Promise<Complaint> {
-    await getOwnedComplaint(complaintId, userId);
-
-    return complaintRepository.update(
-      complaintId,
-      { archived }
-    );
+  // Archives Complaint
+  async setArchived(complaintId: number, userId: number, archived: boolean) {
+    validateUserId(userId);
+    return complaintRepository.setArchived(complaintId, userId, archived);
   },
 
-  async cancelByComplaintId(
-    complaintId: number,
-    userId: number
-  ): Promise<void> {
-    await getOwnedComplaint(complaintId, userId);
-
-    const removed =
-      await complaintRepository.delete(complaintId);
-
-    if (!removed) {
-      throw new Error("Complaint not found.");
-    }
+  // Delete/Cancel Complaint
+  async cancelByComplaintId(complaintId: number, userId: number) {
+    validateUserId(userId);
+    return complaintRepository.delete(complaintId, userId);
   },
 };
